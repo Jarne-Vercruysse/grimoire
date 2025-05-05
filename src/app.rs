@@ -172,7 +172,8 @@ fn is_expired() -> bool {
 
 fn add_to_list(store: Store<StoreFiles>) {
     //let name = what_is_name();
-    let name = "test";
+
+    let name = format!("test");
     let expired = is_expired();
     let item = GrimFile::new(name, expired);
     store.rows().write().push(item);
@@ -207,7 +208,7 @@ pub fn ShareSpace() -> impl IntoView {
                 size=ButtonSize::Large
                 shape=ButtonShape::Circular
                 appearance=thaw::ButtonAppearance::Primary
-                //on_click=add_to_list(files)
+                on_click=move |_| files.rows().write().push(GrimFile::new("somename", false))
             >
                 Add file
             </thaw::Button>
@@ -266,11 +267,6 @@ pub fn ShareSpace() -> impl IntoView {
         </thaw::Table>
     }
 }
-
-// #[component]
-// pub fn FileRow(store: Store<Data>, #[prop(into)] file: Field<DatabaseEntry>) -> impl IntoView {
-//     view! { <p>"DownloadPage"</p> }
-// }
 
 #[component]
 pub fn DownloadPage() -> impl IntoView {
