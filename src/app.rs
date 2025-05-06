@@ -7,6 +7,7 @@ use leptos_router::{
     StaticSegment,
 };
 use reactive_stores::Store;
+use serde::{Deserialize, Serialize};
 use std::sync::atomic::{AtomicU8, Ordering};
 use thaw::Theme;
 use thaw::{self, ButtonShape};
@@ -40,8 +41,8 @@ struct StoreFiles {
     rows: Vec<GrimFile>,
 }
 
-#[derive(Store, Clone)]
-struct GrimFile {
+#[derive(Debug, Store, Clone, Serialize, Deserialize)]
+pub struct GrimFile {
     key: u8,
     name: String,
     expired: bool,
@@ -179,6 +180,63 @@ fn add_to_list(store: Store<StoreFiles>) {
     store.rows().write().push(item);
 }
 
+#[server]
+pub async fn add_file(title: String) -> Result<GrimFile, ServerFnError> {
+    println!("Added: {title}");
+    let file = GrimFile::new(title, false);
+    Ok(file)
+}
+
+#[component]
+pub fn AddFileForm() -> impl IntoView {
+    view! {
+        <p>File form</p>
+        <form>
+        </form>
+    }
+}
+
+#[component]
+fn AddFileActionForm(bestanden: Store<StoreFiles>) -> impl IntoView {
+    // The action is the name of the server fn
+    let action = ServerAction::<AddFile>::new();
+    let value = action.value();
+    let has_error = move || value.with(|val| matches!(val, Some(Err(_))));
+
+    let test = view! {
+                     <ActionForm action>
+                         <label>
+                         "Add a file"
+                         <input type="text" name="title"/>
+                         </label>
+                         <input type="submit" value="Add"/>
+                     </ActionForm>
+                         <p>Sumbitted: {move || format!("{:?}",action.input().get())}</p>
+                         <p>Result: {move || format!("{:?}",action.value().get())}</p>
+
+        // {move || action.value().get().is_some}
+    {println!("{:#?}", value)}
+    {println!("{:#?}", action.value().get())}
+         {if action.value().get().is_some() {
+                 // how to unwrap this inside of this shit
+                 let value = move || action.value().get().unwrap().unwrap();
+                 println!("closure: {:?}", value());
+                 bestanden.rows().write().push(value());
+             }}
+
+                 //{move || bestanden.rows().write().push(action.value().get().unwrap().unwrap())}
+             };
+
+    //if action.value().get().is_some() {
+    //    // how to unwrap this inside of this shit
+    //    let value = move || action.value().get().unwrap().unwrap();
+    //    println!("closure: {:?}", value());
+    //    bestanden.rows().write().push(value());
+    //}
+
+    test
+}
+
 #[component]
 pub fn ShareSpace() -> impl IntoView {
     let files = Store::new(StoreFiles {
@@ -202,6 +260,7 @@ pub fn ShareSpace() -> impl IntoView {
 
     view! {
         <h1>"ShareSpace"</h1>
+        <AddFileActionForm bestanden=files/>
         <thaw::Flex justify=thaw::FlexJustify::SpaceAround>
             <thaw::Button
                 icon=add_icon
