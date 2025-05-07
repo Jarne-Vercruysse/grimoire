@@ -1,13 +1,19 @@
 use leptos::prelude::*;
+//use rand::prelude::*;
+//use leptos_icons;
 use leptos_meta::{provide_meta_context, MetaTags, Stylesheet, Title};
 use leptos_router::{
     components::{Route, Router, Routes},
     StaticSegment,
 };
-use reactive_stores::{Field, Store};
+use reactive_stores::Store;
+use serde::{Deserialize, Serialize};
+use std::sync::atomic::{AtomicU8, Ordering};
 use thaw::Theme;
 use thaw::{self, ButtonShape};
 use thaw::{ssr::SSRMountStyleProvider, ButtonSize};
+
+static NEXT_ID: AtomicU8 = AtomicU8::new(0);
 
 pub fn shell(options: LeptosOptions) -> impl IntoView {
     view! {
@@ -30,16 +36,26 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
 }
 
 #[derive(Store, Clone)]
-struct Data {
+struct StoreFiles {
     #[store(key: u8 = |row| row.key.clone())]
-    rows: Vec<DatabaseEntry>,
+    rows: Vec<GrimFile>,
 }
 
-#[derive(Store, Clone)]
-struct DatabaseEntry {
+#[derive(Debug, Store, Clone, Serialize, Deserialize)]
+pub struct GrimFile {
     key: u8,
     name: String,
     expired: bool,
+}
+
+impl GrimFile {
+    pub fn new(name: impl ToString, expired: bool) -> GrimFile {
+        GrimFile {
+            key: NEXT_ID.fetch_add(1, Ordering::SeqCst),
+            name: name.to_string(),
+            expired,
+        }
+    }
 }
 
 #[component]
@@ -119,63 +135,159 @@ pub fn App() -> impl IntoView {
     }
 }
 
+fn what_is_name() -> String {
+    let vec1 = vec![
+        "sunrise", "ember", "silent", "crystal", "frost", "shadow", "nova", "blaze", "pixel",
+        "drift",
+    ];
+
+    let vec2 = vec![
+        "whisper", "lunar", "dusk", "echo", "breeze", "raven", "flint", "mist", "storm", "cinder",
+    ];
+
+    let vec3 = vec![
+        "harbor", "willow", "sage", "marble", "glimmer", "velvet", "shard", "boulder", "grove",
+        "hollow",
+    ];
+
+    let vec4 = vec![
+        "emberly", "solstice", "prism", "vault", "aurora", "cobalt", "shiver", "tundra", "meadow",
+        "zephyr",
+    ];
+    //let mut rng = rand::rng();
+    let vec1_length = vec1.len();
+    let vec2_length = vec2.len();
+    let vec3_length = vec3.len();
+    let vec4_length = vec4.len();
+
+    let word_one = vec1[vec1_length];
+    let word_two = vec2[vec2_length];
+    let word_three = vec3[vec3_length];
+    let word_four = vec4[vec4_length];
+    format!("{word_one}-{word_two}-{word_three}-{word_four}")
+}
+
+fn is_expired() -> bool {
+    false
+}
+
+fn add_to_list(store: Store<StoreFiles>) {
+    //let name = what_is_name();
+
+    let name = format!("test");
+    let expired = is_expired();
+    let item = GrimFile::new(name, expired);
+    store.rows().write().push(item);
+}
+
+#[server]
+pub async fn add_file(title: String) -> Result<GrimFile, ServerFnError> {
+    println!("Added: {title}");
+    let file = GrimFile::new(title, false);
+    Ok(file)
+}
+
+#[component]
+pub fn AddFileForm() -> impl IntoView {
+    view! {
+        <p>File form</p>
+        <form>
+        </form>
+    }
+}
+
+#[component]
+fn AddFileActionForm(bestanden: Store<StoreFiles>) -> impl IntoView {
+    // The action is the name of the server fn
+    let action = ServerAction::<AddFile>::new();
+    let value = action.value();
+    let has_error = move || value.with(|val| matches!(val, Some(Err(_))));
+
+    let test = view! {
+                     <ActionForm action>
+                         <label>
+                         "Add a file"
+                         <input type="text" name="title"/>
+                         </label>
+                         <input type="submit" value="Add"/>
+                     </ActionForm>
+                         <p>Sumbitted: {move || format!("{:?}",action.input().get())}</p>
+                         <p>Result: {move || format!("{:?}",action.value().get())}</p>
+
+        // {move || action.value().get().is_some}
+    {println!("{:#?}", value)}
+    {println!("{:#?}", action.value().get())}
+         {if action.value().get().is_some() {
+                 // how to unwrap this inside of this shit
+                 let value = move || action.value().get().unwrap().unwrap();
+                 println!("closure: {:?}", value());
+                 bestanden.rows().write().push(value());
+             }}
+
+                 //{move || bestanden.rows().write().push(action.value().get().unwrap().unwrap())}
+             };
+
+    //if action.value().get().is_some() {
+    //    // how to unwrap this inside of this shit
+    //    let value = move || action.value().get().unwrap().unwrap();
+    //    println!("closure: {:?}", value());
+    //    bestanden.rows().write().push(value());
+    //}
+
+    test
+}
+
 #[component]
 pub fn ShareSpace() -> impl IntoView {
-    let count = RwSignal::new(0);
-    let on_click = move |_| *count.write() += 1;
-
-    let files = Store::new(Data {
+    let files = Store::new(StoreFiles {
         rows: vec![
-            DatabaseEntry {
-                key: 1,
-                name: String::from("bestand1"),
-                expired: false,
-            },
-            DatabaseEntry {
-                key: 2,
-                name: String::from("bestand2"),
-                expired: false,
-            },
-            DatabaseEntry {
-                key: 3,
-                name: String::from("bestand3"),
-                expired: false,
-            },
-            DatabaseEntry {
-                key: 4,
-                name: String::from("bestand4"),
-                expired: false,
-            },
-            DatabaseEntry {
-                key: 5,
-                name: String::from("bestand5"),
-                expired: false,
-            },
-            DatabaseEntry {
-                key: 6,
-                name: String::from("bestand6"),
-                expired: true,
-            },
+            GrimFile::new("randomtekst.png", false),
+            GrimFile::new("panda.png", true),
+            GrimFile::new("kreeft.png", true),
+            GrimFile::new("hond.png", true),
+            GrimFile::new("kat.png", true),
+            GrimFile::new("dog.png", true),
+            GrimFile::new("gobbler.png", true),
+            GrimFile::new("king.png", true),
+            GrimFile::new("sucker.png", true),
         ],
     });
 
+    let count = RwSignal::new(0);
+    let on_click = move |_| *count.write() += 1;
+    let add_icon = RwSignal::new(Some(icondata::AiPlusCircleOutlined));
+    let remove_icon = RwSignal::new(Some(icondata::AiDeleteOutlined));
+
     view! {
         <h1>"ShareSpace"</h1>
-        <thaw::Button
-            size=ButtonSize::Large
-            shape=ButtonShape::Circular
-            appearance=thaw::ButtonAppearance::Primary
-            on_click=on_click
-        >
-            Click me
-            {count}
-        </thaw::Button>
+        <AddFileActionForm bestanden=files/>
+        <thaw::Flex justify=thaw::FlexJustify::SpaceAround>
+            <thaw::Button
+                icon=add_icon
+                size=ButtonSize::Large
+                shape=ButtonShape::Circular
+                appearance=thaw::ButtonAppearance::Primary
+                on_click=move |_| files.rows().write().push(GrimFile::new("somename", false))
+            >
+                Add file
+            </thaw::Button>
+
+            <thaw::Button
+                icon=remove_icon
+                size=ButtonSize::Large
+                shape=ButtonShape::Circular
+                appearance=thaw::ButtonAppearance::Subtle
+                on_click=on_click
+            >
+                Remove
+                {count}
+            </thaw::Button>
+
+        </thaw::Flex>
         <thaw::Table>
             <thaw::TableHeader>
                 <thaw::TableRow>
-                    <thaw::TableHeaderCell resizable=true>
-                        "ID"
-                    </thaw::TableHeaderCell>
+                    <thaw::TableHeaderCell resizable=true>"ID"</thaw::TableHeaderCell>
                     <thaw::TableHeaderCell resizable=true>"NAME"</thaw::TableHeaderCell>
                     <thaw::TableHeaderCell>"expired"</thaw::TableHeaderCell>
                 </thaw::TableRow>
@@ -189,7 +301,7 @@ pub fn ShareSpace() -> impl IntoView {
                         let name = child.name();
                         let expired = child.expired();
                         view! {
-                            //<li>{move || name.get()}</li>
+                            // <li>{move || name.get()}</li>
                             <thaw::TableRow>
                                 <thaw::TableCell>
                                     <thaw::TableCellLayout>
@@ -214,11 +326,6 @@ pub fn ShareSpace() -> impl IntoView {
         </thaw::Table>
     }
 }
-
-// #[component]
-// pub fn FileRow(store: Store<Data>, #[prop(into)] file: Field<DatabaseEntry>) -> impl IntoView {
-//     view! { <p>"DownloadPage"</p> }
-// }
 
 #[component]
 pub fn DownloadPage() -> impl IntoView {
