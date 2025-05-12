@@ -41,6 +41,7 @@ pub fn App() -> impl IntoView {
                 <main>
                     <Routes fallback=|| "Error">
                         <Route path=StaticSegment("login") view=auth::LoginPage />
+                        <Route path=StaticSegment("registration") view=auth::RegistrationPage/>
                         <Route path=StaticSegment("") view=|| TestPage/>
                     </Routes>
                 </main>
