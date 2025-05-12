@@ -15,7 +15,6 @@ axum = { version = "0.8", optional = true }
 console_error_panic_hook = { version = "0.1", optional = true}
 tokio = { version = "1", features = ["rt-multi-thread"], optional = true }
 wasm-bindgen = { version = "=0.2.100", optional = true }
-thaw = { version = "0.5.0-beta", features = ["nightly"]}
 reactive_stores = "0.2.2"
 leptos_icons = "0.5.0"
 icondata = "0.5.0"
@@ -26,7 +25,6 @@ sqlx = { version = "0.8", features = [ "runtime-tokio","postgres","migrate","uui
 [features]
 hydrate = [
     "leptos/hydrate",
-    "thaw/hydrate",
     "dep:console_error_panic_hook",
     "dep:wasm-bindgen",
 ]
@@ -38,7 +36,6 @@ ssr = [
     "leptos/ssr",
     "leptos_meta/ssr",
     "leptos_router/ssr",
-    "thaw/ssr",
 ]
 
 # Defines a size-optimized profile for the WASM bundle in release mode

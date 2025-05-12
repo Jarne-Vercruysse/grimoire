@@ -1,15 +1,27 @@
-#[server]
-fn login_user() {}
+use leptos::prelude::*;
+use leptos_router::components::A;
 
 #[server]
-fn logout_user() {}
+async fn login_user() -> Result<(), ServerFnError> {
+    Ok(())
+}
 
 #[server]
-fn register_user() {}
+async fn logout_user() -> Result<(), ServerFnError> {
+    Ok(())
+}
+
+#[server]
+async fn register_user() -> Result<(), ServerFnError> {
+    Ok(())
+}
 
 #[component]
-fn LoginPage() -> impl IntoView {
-    todo!()
+pub fn LoginPage() -> impl IntoView {
+    view! {
+        "Something"
+        <A href="/">To root</A>
+    }
 }
 
 #[component]
