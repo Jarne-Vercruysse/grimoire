@@ -5,27 +5,24 @@ use leptos_router::{
     components::{Route, Router, Routes, A},
     StaticSegment,
 };
-use reactive_stores::Store;
-use serde::{Deserialize, Serialize};
-use std::sync::atomic::{AtomicU8, Ordering};
 
 //static NEXT_ID: AtomicU8 = AtomicU8::new(0);
 
 pub fn shell(options: LeptosOptions) -> impl IntoView {
     view! {
-            <!DOCTYPE html>
-            <html lang="en">
-                <head>
-                    <meta charset="utf-8" />
-                    <meta name="viewport" content="width=device-width, initial-scale=1" />
-                    <AutoReload options=options.clone() />
-                    <HydrationScripts options />
-                    <MetaTags />
-                </head>
-                <body>
-                    <App />
-                </body>
-            </html>
+        <!DOCTYPE html>
+        <html lang="en">
+            <head>
+                <meta charset="utf-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <AutoReload options=options.clone() />
+                <HydrationScripts options />
+                <MetaTags />
+            </head>
+            <body class="flex flex-col min-h-screen content-center justify-center p-10">
+                <App />
+            </body>
+        </html>
     }
 }
 
@@ -34,17 +31,16 @@ pub fn App() -> impl IntoView {
     provide_meta_context();
 
     view! {
-
         <Stylesheet id="leptos" href="/pkg/grimoire.css" />
         <Title text="Grimoire" />
         <Router>
-                <main>
-                    <Routes fallback=|| "Error">
-                        <Route path=StaticSegment("login") view=auth::LoginPage />
-                        <Route path=StaticSegment("registration") view=auth::RegistrationPage/>
-                        <Route path=StaticSegment("") view=|| TestPage/>
-                    </Routes>
-                </main>
+            <main>
+                <Routes fallback=|| "Error">
+                    <Route path=StaticSegment("login") view=auth::LoginPage />
+                    <Route path=StaticSegment("registration") view=auth::RegistrationPage />
+                    <Route path=StaticSegment("") view=|| TestPage />
+                </Routes>
+            </main>
         </Router>
     }
 }
