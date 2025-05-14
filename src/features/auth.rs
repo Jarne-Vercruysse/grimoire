@@ -18,15 +18,15 @@ async fn logout_user() -> Result<(), ServerFnError> {
     Ok(())
 }
 
-#[server]
-async fn register_user(user: CreateUser) -> Result<(), ServerFnError> {
-    logging::log!(
-        "User got created.Email:  {:#?}, Password: {:#?}",
-        user.email,
-        user.password
-    );
-    Ok(())
-}
+//#[server]
+//async fn register_user(user: CreateUser) -> Result<(), ServerFnError> {
+//    logging::log!(
+//        "User got created.Email:  {:#?}, Password: {:#?}",
+//        user.email,
+//        user.password
+//    );
+//    Ok(())
+//}
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 struct LoginCredentials {
@@ -34,13 +34,13 @@ struct LoginCredentials {
     password: String,
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug)]
-struct CreateUser {
-    first_name: String,
-    last_name: String,
-    email: String,
-    password: String,
-}
+//#[derive(Deserialize, Serialize, Clone, Debug)]
+//struct CreateUser {
+//    first_name: String,
+//    last_name: String,
+//    email: String,
+//    password: String,
+//}
 
 #[component]
 pub fn LoginPage() -> impl IntoView {
@@ -92,64 +92,64 @@ pub fn LoginPage() -> impl IntoView {
     }
 }
 
-#[component]
-pub fn RegistrationPage() -> impl IntoView {
-    let action = ServerAction::<RegisterUser>::new();
-    logging::log!("RegistrationPage");
-
-    view! {
-    <ActionForm action>
-                <fieldset class="fieldset bg-base-200 border-accent rounded-box w-xs border-2 py-8 px-6 space-y-2">
-                    <legend class="fieldset-legend text-xl text-accent">Signup</legend>
-
-                    <label class="floating-label">
-                        <span>First name</span>
-                        <input
-                            type="text"
-                            name="user[first_name]"
-                            placeholder="First name"
-                            class="input"
-                        />
-                    </label>
-
-                    <label class="floating-label">
-                        <span>Last name</span>
-                        <input
-                            type="text"
-                            name="user[last_name]"
-                            placeholder="Last name"
-                            class="input"
-                        />
-                    </label>
-
-
-                    <label class="floating-label">
-                        <span>Email</span>
-                        <input
-                            type="text"
-                            name="user[email]"
-                            placeholder="Last name"
-                            class="input"
-                        />
-                    </label>
-
-
-                    <label class="floating-label">
-                        <span>Password</span>
-                        <input
-                            type="text"
-                            name="user[password]"
-                            placeholder="Password"
-                            class="input"
-                        />
-                    </label>
-                    <input type="submit" value="Signup" class="btn btn-accent mt-4" />
-                    <div class="flex flex-row place-content-between">
-                        <div class="link link-hover link-primary">
-                            <A href="/login">Sign in</A>
-                        </div>
-                    </div>
-                </fieldset>
-            </ActionForm>
-        }
-}
+//#[component]
+//pub fn RegistrationPage() -> impl IntoView {
+//    let action = ServerAction::<RegisterUser>::new();
+//    logging::log!("RegistrationPage");
+//
+//    view! {
+//    <ActionForm action>
+//                <fieldset class="fieldset bg-base-200 border-accent rounded-box w-xs border-2 py-8 px-6 space-y-2">
+//                    <legend class="fieldset-legend text-xl text-accent">Signup</legend>
+//
+//                    <label class="floating-label">
+//                        <span>First name</span>
+//                        <input
+//                            type="text"
+//                            name="user[first_name]"
+//                            placeholder="First name"
+//                            class="input"
+//                        />
+//                    </label>
+//
+//                    <label class="floating-label">
+//                        <span>Last name</span>
+//                        <input
+//                            type="text"
+//                            name="user[last_name]"
+//                            placeholder="Last name"
+//                            class="input"
+//                        />
+//                    </label>
+//
+//
+//                    <label class="floating-label">
+//                        <span>Email</span>
+//                        <input
+//                            type="text"
+//                            name="user[email]"
+//                            placeholder="Last name"
+//                            class="input"
+//                        />
+//                    </label>
+//
+//
+//                    <label class="floating-label">
+//                        <span>Password</span>
+//                        <input
+//                            type="text"
+//                            name="user[password]"
+//                            placeholder="Password"
+//                            class="input"
+//                        />
+//                    </label>
+//                    <input type="submit" value="Signup" class="btn btn-accent mt-4" />
+//                    <div class="flex flex-row place-content-between">
+//                        <div class="link link-hover link-primary">
+//                            <A href="/login">Sign in</A>
+//                        </div>
+//                    </div>
+//                </fieldset>
+//            </ActionForm>
+//        }
+//}
