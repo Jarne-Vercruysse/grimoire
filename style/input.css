@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+@plugin "./daisyui.js" {
+  themes:
+    emerald --default,
+    coffee;
+}

@@ -44,22 +44,51 @@ struct CreateUser {
 
 #[component]
 pub fn LoginPage() -> impl IntoView {
-    let login_action = ServerAction::<LoginUser>::new();
+    let action = ServerAction::<LoginUser>::new();
     logging::log!("LoginPage");
 
+    // <div class="relative flex flex-col items-center justify-center h-screen overflow-hidden">
     view! {
-         <ActionForm action=login_action>
-        <label>
-            "Email"
-            <input type="tekst" name="credentials[email]"/>
-        </label>
-        <label>
-            "password"
-            <input type="tekst" name="credentials[password]"/>
-        </label>
-            <input type="submit"/>
+        // <div class="relative flex flex-col items-center justify-center h-screen overflow-hidden">
+        // <div class="w-full p-6 base-100 border-t-4 border-secondary rounded-md shadow-md border-top lg:max-w-lg">
+        // <div class="bg-base-300 p-6 border-t-4 border-accent rounded-md lg:max-w-lg">
+        // <div class="card-body">
+        // <h1 class="card-title w-full text-5xl font-semibold text-left text-accent pb-4">
+        // Grimoire
+        // </h1>
+        <ActionForm action>
+            <fieldset class="fieldset bg-base-200 border-accent rounded-box w-xs border-2 py-8 px-6 space-y-2">
+                <legend class="fieldset-legend text-xl text-accent">Sign In</legend>
+                <label class="floating-label">
+                    <span>Email</span>
+                    <input
+                        type="text"
+                        name="credentials[email]"
+                        placeholder="Email"
+                        class="input"
+                    />
+                </label>
+
+                <label class="floating-label">
+                    <span>Password</span>
+                    <input
+                        type="text"
+                        name="credentials[password]"
+                        placeholder="Password"
+                        class="input"
+                    />
+                </label>
+                <input type="submit" value="Login" class="btn btn-accent mt-4" />
+                <div class="flex flex-row place-content-between">
+                    <div class="link link-hover link-accent">
+                        <A href="/registration">Signup</A>
+                    </div>
+                    <div class="link link-hover link-neutral">
+                        <A href="/">Forgot Password?</A>
+                    </div>
+                </div>
+            </fieldset>
         </ActionForm>
-        <A href="/registration">Create account</A>
     }
 }
 
@@ -69,25 +98,58 @@ pub fn RegistrationPage() -> impl IntoView {
     logging::log!("RegistrationPage");
 
     view! {
-         <ActionForm action>
-        <label>
-            "First Name"
-            <input type="tekst" name="user[first_name]"/>
-        </label>
-        <label>
-            "Last name"
-            <input type="tekst" name="user[last_name]"/>
-        </label>
-        <label>
-            "Email"
-            <input type="tekst" name="user[email]"/>
-        </label>
-        <label>
-            "password"
-            <input type="tekst" name="user[password]"/>
-        </label>
-            <input type="submit"/>
-        </ActionForm>
-        <A href="/">root</A>
-    }
+    <ActionForm action>
+                <fieldset class="fieldset bg-base-200 border-accent rounded-box w-xs border-2 py-8 px-6 space-y-2">
+                    <legend class="fieldset-legend text-xl text-accent">Signup</legend>
+
+                    <label class="floating-label">
+                        <span>First name</span>
+                        <input
+                            type="text"
+                            name="user[first_name]"
+                            placeholder="First name"
+                            class="input"
+                        />
+                    </label>
+
+                    <label class="floating-label">
+                        <span>Last name</span>
+                        <input
+                            type="text"
+                            name="user[last_name]"
+                            placeholder="Last name"
+                            class="input"
+                        />
+                    </label>
+
+
+                    <label class="floating-label">
+                        <span>Email</span>
+                        <input
+                            type="text"
+                            name="user[email]"
+                            placeholder="Last name"
+                            class="input"
+                        />
+                    </label>
+
+
+                    <label class="floating-label">
+                        <span>Password</span>
+                        <input
+                            type="text"
+                            name="user[password]"
+                            placeholder="Password"
+                            class="input"
+                        />
+                    </label>
+                    <input type="submit" value="Signup" class="btn btn-accent mt-4" />
+                    <div class="flex flex-row place-content-between">
+                        <div class="link link-hover link-primary">
+                            <A href="/login">Sign in</A>
+                        </div>
+                    </div>
+                </fieldset>
+            </ActionForm>
+        }
 }
