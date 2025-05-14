@@ -1,9 +1,11 @@
-use super::features::*;
-use leptos::prelude::*;
-use leptos_meta::{provide_meta_context, MetaTags, Stylesheet, Title};
-use leptos_router::{
-    components::{Route, Router, Routes, A},
-    StaticSegment,
+use {
+    super::features::*,
+    leptos::prelude::*,
+    leptos_meta::{provide_meta_context, MetaTags, Stylesheet, Title},
+    leptos_router::{
+        components::{Route, Router, Routes, A},
+        StaticSegment,
+    },
 };
 
 //static NEXT_ID: AtomicU8 = AtomicU8::new(0);
@@ -37,7 +39,7 @@ pub fn App() -> impl IntoView {
             <main>
                 <Routes fallback=|| "Error">
                     <Route path=StaticSegment("login") view=auth::LoginPage />
-                    <Route path=StaticSegment("registration") view=auth::RegistrationPage />
+                    <Route path=StaticSegment("registration") view=registration::RegistrationPage />
                     <Route path=StaticSegment("") view=|| TestPage />
                 </Routes>
             </main>
