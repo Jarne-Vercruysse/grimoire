@@ -3,7 +3,7 @@ use {
     leptos::prelude::*,
     leptos_meta::{provide_meta_context, MetaTags, Stylesheet, Title},
     leptos_router::{
-        components::{Route, Router, Routes, A},
+        components::{Route, Router, Routes},
         StaticSegment,
     },
 };
@@ -40,18 +40,10 @@ pub fn App() -> impl IntoView {
                 <Routes fallback=|| "Error">
                     <Route path=StaticSegment("login") view=auth::LoginPage />
                     <Route path=StaticSegment("registration") view=registration::RegistrationPage />
-                    <Route path=StaticSegment("") view=|| TestPage />
+                    <Route path=StaticSegment("") view=|| home::HomePage />
                 </Routes>
             </main>
         </Router>
-    }
-}
-
-#[component]
-pub fn TestPage() -> impl IntoView {
-    view! {
-        "TestPage"
-        <A href="login">Link to login</A>
     }
 }
 
