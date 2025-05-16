@@ -21,7 +21,8 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
                 <HydrationScripts options />
                 <MetaTags />
             </head>
-            <body class="flex flex-col min-h-screen content-center justify-center p-10">
+            <body>
+                // <body class="flex bg-primary flex-col min-h-screen content-center justify-center p-10 border-5 border-accent">
                 <App />
             </body>
         </html>
