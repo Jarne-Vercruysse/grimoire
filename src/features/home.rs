@@ -33,7 +33,7 @@ pub fn HomePage() -> impl IntoView {
             .on_enter(move |_| set_dropped(false)),
     );
 
-    let upload_data = Store::new(UploadTable::default());
+    let upload_data: Store<UploadTable>;
     let upload_store = Store::new(UploadTable {
         files: (move || {
             files
@@ -42,6 +42,19 @@ pub fn HomePage() -> impl IntoView {
                 .map(|file| FileUpload::from_web_sys(file))
                 .collect::<Vec<FileUpload>>()
         })(),
+    });
+
+    Effect::new(move || {
+        let dropped_files = files.get();
+        if !dropped_files.is_empty() {
+            let files = dropped_files
+                .iter()
+                .map(|file| FileUpload::from_web_sys(file))
+                .collect::<Vec<FileUpload>>();
+            for file in files {
+                upload_store.files().write().push(file);
+            }
+        }
     });
 
     view! {
