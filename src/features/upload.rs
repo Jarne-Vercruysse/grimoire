@@ -1,5 +1,5 @@
 use {
-    leptos::{html::Div, prelude::*},
+    leptos::{html::Div, prelude::*, web_sys::File},
     leptos_use::{use_drop_zone_with_options, UseDropZoneOptions, UseDropZoneReturn},
     reactive_stores::Store,
 };
@@ -18,6 +18,16 @@ struct FileUpload {
 }
 
 impl FileUpload {
+    fn from_web_sys(file: &File) -> Self {
+        let name = file.name();
+        let file_type = file.type_();
+        let size = file.size();
+        Self {
+            name,
+            file_type,
+            size,
+        }
+    }
     fn new(name: String, file_type: String, size: f64) -> Self {
         Self {
             name,
@@ -30,11 +40,6 @@ impl FileUpload {
 #[component]
 pub fn UploadZone() -> impl IntoView {
     let (dropped, set_dropped) = signal(false);
-    let upload_store = Store::new(FileUpload::new(
-        "test".to_string(),
-        "big".to_string(),
-        355.0,
-    ));
 
     let drop_zone_el = NodeRef::<Div>::new();
 
@@ -48,12 +53,13 @@ pub fn UploadZone() -> impl IntoView {
             .on_enter(move |_| set_dropped(false)),
     );
 
-    //let empty_files = files.read().clear();
-    //let upload =
-    //    upload_store
-    //        .files()
-    //        .write()
-    //        .push(FileUpload::new(file.name(), file.type_(), file.size()));
+    let upload_store = Store::new(
+        files
+            .get()
+            .iter()
+            .map(|file| FileUpload::from_web_sys(file))
+            .collect::<Vec<FileUpload>>(),
+    );
 
     view! {
         <div node_ref=drop_zone_el class="border-dashed border-5 border-info grow-1 bg-error">
