@@ -3,7 +3,7 @@ use {
     leptos::prelude::*,
     leptos_meta::{provide_meta_context, MetaTags, Stylesheet, Title},
     leptos_router::{
-        components::{Route, Router, Routes, A},
+        components::{Route, Router, Routes},
         StaticSegment,
     },
 };
@@ -21,7 +21,8 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
                 <HydrationScripts options />
                 <MetaTags />
             </head>
-            <body class="flex flex-col min-h-screen content-center justify-center p-10">
+            <body>
+                // <body class="flex bg-primary flex-col min-h-screen content-center justify-center p-10 border-5 border-accent">
                 <App />
             </body>
         </html>
@@ -40,18 +41,10 @@ pub fn App() -> impl IntoView {
                 <Routes fallback=|| "Error">
                     <Route path=StaticSegment("login") view=auth::LoginPage />
                     <Route path=StaticSegment("registration") view=registration::RegistrationPage />
-                    <Route path=StaticSegment("") view=|| TestPage />
+                    <Route path=StaticSegment("") view=|| home::HomePage />
                 </Routes>
             </main>
         </Router>
-    }
-}
-
-#[component]
-pub fn TestPage() -> impl IntoView {
-    view! {
-        "TestPage"
-        <A href="login">Link to login</A>
     }
 }
 

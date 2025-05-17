@@ -14,7 +14,8 @@ async fn login_user(credentials: LoginCredentials) -> Result<(), ServerFnError> 
 }
 
 #[server]
-async fn logout_user() -> Result<(), ServerFnError> {
+pub async fn logout_user() -> Result<(), ServerFnError> {
+    leptos_axum::redirect("/login");
     Ok(())
 }
 
