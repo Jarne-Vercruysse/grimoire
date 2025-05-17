@@ -1,3 +1,4 @@
+use super::{auth::LogoutUser, upload::UploadZone};
 use {
     icondata,
     leptos::{logging, prelude::*},
@@ -6,7 +7,7 @@ use {
 
 #[component]
 pub fn HomePage() -> impl IntoView {
-    let logout_action = ServerAction::<super::auth::LogoutUser>::new();
+    let logout_action = ServerAction::<LogoutUser>::new();
     logging::log!("homepage");
     view! {
         <div class="min-h-screen flex flex-row-reverse border-5 border-accent">
@@ -26,11 +27,13 @@ pub fn HomePage() -> impl IntoView {
             // "Main content"
             <div class="border-5 border-secondary flex flex-col w-screen">
                 // div around drop zone
-                <div class="border-dashed border-5 bg-base-100 p-20 border border-secondary glass grow-1">
-                    <p class="text-5xl">DROP FILES</p>
-                </div>
+
+                <UploadZone />
+                // <div class="border-dashed border-5 bg-base-100 p-20 border border-secondary glass grow-1">
+                // <p class="text-5xl">DROP FILES</p>
+                // </div>
                 // div aroun table
-                <div class="border-4 border-primary p-10 grow-10">
+                <div class="border-4 border-primary grow-5">
                     <table class="table bg-base-300">
                         <thead>
                             <tr>
@@ -78,7 +81,9 @@ pub fn HomePage() -> impl IntoView {
                         </tbody>
                     </table>
                 </div>
-                <div class="border-4 border-accent">"Action div only visable when something is selected"</div>
+                <div class="border-4 border-accent">
+                    "Action div only visable when something is selected"
+                </div>
             </div>
         </div>
     }
