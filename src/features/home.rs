@@ -49,17 +49,20 @@ pub fn HomePage() -> impl IntoView {
         if !dropped_files.is_empty() {
             let files = dropped_files
                 .iter()
-                .map(|file| FileUpload::from_web_sys(file))
+                .map(|file| {
+                    logging::log!("{}", file.name());
+                    FileUpload::from_web_sys(file)
+                })
                 .collect::<Vec<FileUpload>>();
             for file in files {
-                upload_store.files().write().push(file);
+                upload_data.files().write().push(file);
             }
         }
     });
 
     view! {
-        <div class="min-h-screen flex flex-row-reverse border-5 border-accent">
-            <div class="border-5 border-error p-10 flex flex-col justify-between">
+        <div class="min-h-screen flex flex-row-reverse border-5 border-accent bg-accent">
+            <div class="border-5 border-error p-10 flex flex-col justify-between bg-base-300">
                 <div>
                     <Icon icon=icondata::AiApiFilled width="9em" height="9em" />
                     // <img src=icondata::AiApiFilled/>
@@ -73,7 +76,7 @@ pub fn HomePage() -> impl IntoView {
 
             // div for Main content
             // "Main content"
-            <div class="border-5 border-secondary flex flex-col w-screen">
+            <div class="border-5 border-secondary flex flex-col w-screen bg-secondary">
                 // div around drop zone
 
                 <UploadZone drop_zone=drop_zone_el dropped hover=is_over_drop_zone />
@@ -81,7 +84,7 @@ pub fn HomePage() -> impl IntoView {
                 // <p class="text-5xl">DROP FILES</p>
                 // </div>
                 // div aroun table
-                <div class="border-4 border-primary grow-5">
+                <div class="border-4 border-primary bg- grow-5" >
                     <table class="table bg-base-300">
                         <thead>
                             <tr>
