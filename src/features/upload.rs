@@ -1,14 +1,14 @@
-use std::sync::atomic::{AtomicUsize, Ordering};
-use {
-    leptos::{html::Div, prelude::*, web_sys::File},
-    reactive_stores::{Field, Store},
-};
+use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
-static NEXT_ID: AtomicUsize = AtomicUsize::new(0);
+use {
+    leptos::{html::Div, logging, prelude::*, web_sys::File},
+    reactive_stores::Store,
+};
 
 #[derive(Store)]
 pub struct UploadTable {
-    #[store(key: usize = |file| file.id)]
+    #[store(key: Uuid = |file| file.id)]
     pub files: Vec<FileUpload>,
 }
 
@@ -20,11 +20,12 @@ impl Default for UploadTable {
 
 #[derive(Store, Clone)]
 pub struct FileUpload {
-    pub id: usize,
-    name: String,
+    pub id: Uuid,
+    pub name: String,
     file_type: String,
     size: f64,
-    status: RwSignal<Status>,
+    pub status: Status,
+    //status: RwSignal<Status>,
 }
 
 impl FileUpload {
@@ -32,18 +33,44 @@ impl FileUpload {
         let name = file.name();
         let file_type = file.type_();
         let size = file.size();
-        let status = RwSignal::new(Status::Pending);
+        let status = Status::Pending;
+        let id = Uuid::new_v4();
         Self {
-            id: NEXT_ID.fetch_add(1, Ordering::Relaxed),
+            id,
             name,
             file_type,
             size,
             status,
         }
     }
+
+    pub fn update_status(&mut self, status: Status) {
+        match status {
+            Status::Pending => self.status = Status::Pending,
+            Status::Uploading => self.status = Status::Uploading,
+            Status::Uploaded => self.status = Status::Uploaded,
+            Status::Failed => self.status = Status::Failed,
+            Status::Cancelled => self.status = Status::Cancelled,
+        };
+    }
+    pub fn to_dto(&self) -> FileUploadDto {
+        FileUploadDto {
+            id: self.id,
+            name: self.name.clone(),
+            file_type: self.file_type.clone(),
+            size: self.size,
+        }
+    }
+}
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct FileUploadDto {
+    pub id: Uuid,
+    pub name: String,
+    pub file_type: String,
+    pub size: f64,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
 pub enum Status {
     Pending,
     Uploading,
@@ -71,10 +98,19 @@ pub fn UploadZone(
     hover: Signal<bool>,
 ) -> impl IntoView {
     view! {
-        <div node_ref=drop_zone class="border-dashed border-5 border-info grow-1 bg-error">
+        <div node_ref=drop_zone class="border-dashed border-5 border-info grow-1 bg-info">
             <p class="text-5xl">DROP FILES uploadzone</p>
             <div>Dropped: {dropped}</div>
             <div>is_over_drop_zone: {hover}</div>
         </div>
     }
+}
+
+#[server]
+pub async fn upload_file(file: FileUploadDto) -> Result<(), ServerFnError> {
+    logging::log!("file uploading: {:?}", file.name);
+    let _ = tokio::time::sleep(tokio::time::Duration::from_millis(5000)).await;
+    logging::log!("file uploaded: {:?}", file.name);
+
+    Ok(())
 }
