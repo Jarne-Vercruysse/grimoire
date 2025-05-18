@@ -33,7 +33,7 @@ pub fn HomePage() -> impl IntoView {
             .on_enter(move |_| set_dropped(false)),
     );
 
-    let upload_data: Store<UploadTable>;
+    let upload_data: Store<UploadTable> = Store::new(UploadTable::default());
     let upload_store = Store::new(UploadTable {
         files: (move || {
             files

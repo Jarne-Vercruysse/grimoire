@@ -12,6 +12,12 @@ pub struct UploadTable {
     pub files: Vec<FileUpload>,
 }
 
+impl Default for UploadTable {
+    fn default() -> Self {
+        Self { files: Vec::new() }
+    }
+}
+
 #[derive(Store, Clone)]
 pub struct FileUpload {
     pub id: usize,
