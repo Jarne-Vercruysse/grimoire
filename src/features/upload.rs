@@ -24,6 +24,7 @@ pub struct FileUpload {
     name: String,
     file_type: String,
     size: f64,
+    status: RwSignal<Status>,
 }
 
 impl FileUpload {
@@ -31,19 +32,34 @@ impl FileUpload {
         let name = file.name();
         let file_type = file.type_();
         let size = file.size();
+        let status = RwSignal::new(Status::Pending);
         Self {
             id: NEXT_ID.fetch_add(1, Ordering::Relaxed),
             name,
             file_type,
             size,
+            status,
         }
     }
-    fn new(name: String, file_type: String, size: f64) -> Self {
-        Self {
-            id: NEXT_ID.fetch_add(1, Ordering::Relaxed),
-            name,
-            file_type,
-            size,
+}
+
+#[derive(Clone)]
+pub enum Status {
+    Pending,
+    Uploading,
+    Uploaded,
+    Failed,
+    Cancelled,
+}
+
+impl Status {
+    pub fn badge_props(status: Status) -> (&'static str, &'static str) {
+        match status {
+            Status::Pending => ("Pending", "badge badge-info"),
+            Status::Uploading => ("Uploading", "badge badge-info"),
+            Status::Uploaded => ("Uploaded", "badge badge-succes"),
+            Status::Failed => ("Failed", "badge badge-error"),
+            Status::Cancelled => ("Cancelled", "badge badge-warning"),
         }
     }
 }

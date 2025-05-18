@@ -1,10 +1,8 @@
-use leptos::leptos_dom::logging::console_log;
-
-use crate::features::upload::UploadTable;
-
 use super::{
     auth::LogoutUser,
-    upload::{FileUpload, FileUploadStoreFields, UploadTableStoreFields, UploadZone},
+    upload::{
+        FileUpload, FileUploadStoreFields, Status, UploadTable, UploadTableStoreFields, UploadZone,
+    },
 };
 use {
     icondata,
@@ -49,11 +47,9 @@ pub fn HomePage() -> impl IntoView {
         if !dropped_files.is_empty() {
             let files = dropped_files
                 .iter()
-                .map(|file| {
-                    logging::log!("{}", file.name());
-                    FileUpload::from_web_sys(file)
-                })
+                .map(|file| FileUpload::from_web_sys(file))
                 .collect::<Vec<FileUpload>>();
+
             for file in files {
                 upload_data.files().write().push(file);
             }
@@ -84,8 +80,9 @@ pub fn HomePage() -> impl IntoView {
                 // <p class="text-5xl">DROP FILES</p>
                 // </div>
                 // div aroun table
-                <div class="border-4 border-primary bg- grow-5" >
+                <div class="border-4 border-primary bg- grow-5">
                     <table class="table bg-base-300">
+                        // <FileHeader />
                         <thead>
                             <tr>
                                 <th>
@@ -96,8 +93,10 @@ pub fn HomePage() -> impl IntoView {
                                 <th>Name</th>
                                 <td>Type</td>
                                 <td>Size</td>
+                                <td>Status</td>
                             </tr>
                         </thead>
+
                         <tbody>
                             <For each=move || upload_store.files() key=|f| f.id().get() let:file>
                                 <FileRow file />
@@ -125,8 +124,30 @@ pub fn HomePage() -> impl IntoView {
         </div>
     }
 }
+
+#[component]
+fn FileHeader() -> impl IntoView {
+    view! {
+        <thead>
+            <tr>
+                <th>
+                    <label>
+                        <input type="checkbox" class="checkbox" />
+                    </label>
+                </th>
+                <th>Name</th>
+                <td>Type</td>
+                <td>Size</td>
+                <td>Status</td>
+            </tr>
+        </thead>
+    }
+}
+
 #[component]
 fn FileRow(#[prop(into)] file: Field<FileUpload>) -> impl IntoView {
+    let status = file.status().get();
+    logging::log!("Creating a row");
     view! {
         <tr class="hover:bg-base-300">
             <td>
@@ -137,6 +158,19 @@ fn FileRow(#[prop(into)] file: Field<FileUpload>) -> impl IntoView {
             <td>{file.name()}</td>
             <td>{file.file_type()}</td>
             <td>{file.size()}</td>
+        // <StatusBadge status/>
         </tr>
+    }
+}
+
+#[component]
+fn StatusBadge(status: RwSignal<Status>) -> impl IntoView {
+    //let x = status;
+    logging::log!("Setting status");
+    let badge = Status::badge_props(status.get());
+    view! {
+        <td>
+            <span class=badge.1>{move || badge.0}</span>
+        </td>
     }
 }
