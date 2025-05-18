@@ -18,10 +18,10 @@ wasm-bindgen = { version = "=0.2.100", optional = true }
 reactive_stores = "0.2.2"
 leptos_icons = "0.6.0"
 icondata = "0.5.0"
-#serde = "1.0.219"
 serde = { version = "1.0", features = ["derive"] }
 uuid = { version = "1.16.0", features = ["v4", "js"] }
 sqlx = { version = "0.8", features = [ "runtime-tokio","postgres","migrate","uuid" ], optional = true }
+leptos-use = { version = "0.16.0-beta", default-features = false, features = ["use_drop_zone"]}
 
 [features]
 hydrate = [
@@ -37,6 +37,8 @@ ssr = [
     "leptos/ssr",
     "leptos_meta/ssr",
     "leptos_router/ssr",
+    "leptos-use/ssr",
+    "leptos-use/axum",
 ]
 
 # Defines a size-optimized profile for the WASM bundle in release mode
