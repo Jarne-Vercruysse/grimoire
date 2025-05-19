@@ -92,7 +92,7 @@ pub fn HomePage() -> impl IntoView {
         <div class="h-screen flex flex-row-reverse border-5 border-accent bg-base-100">
             <Sidebar />
             <div class="border-5 w-screen border-secondary flex flex-col">
-                <UploadZone drop_zone=drop_zone_el />
+                <UploadZone drop_zone=drop_zone_el client />
                 <div class="border-4 grow-3 overflow-auto">
                     <Table client />
                 </div>
