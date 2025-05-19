@@ -41,7 +41,7 @@ pub fn UploadZone(
     hover: Signal<bool>,
 ) -> impl IntoView {
     view! {
-        <div node_ref=drop_zone class="border-dashed border-5 border-info grow-1 bg-error">
+        <div node_ref=drop_zone class="border-dashed h-64 border-5 border-info grow-2 bg-error">
             <p class="text-5xl">DROP FILES uploadzone</p>
             <div>Dropped: {dropped}</div>
             <div>is_over_drop_zone: {hover}</div>
