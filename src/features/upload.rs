@@ -11,50 +11,22 @@ use leptos_icons::Icon;
 
 use crate::types::{Client, FileEntry, Message};
 
-//#[derive(Store)]
-//pub struct UploadTable {
-//    #[storerkey: usize = |file| file.id)]
-//    pub files: Vec<FileUpload>,
-//}
-//
-//impl Default for UploadTable {
-//    fn default() -> Self {
-//        Self { files: Vec::new() }
-//    }
-//}
-//
-//#[derive(Store, Clone)]
-//pub struct FileUpload {
-//    pub id: usize,
-//    name: String,
-//    file_type: String,
-//    size: f64,
-//}
-//
-//impl FileUpload {
-//    pub fn from_web_sys(file: &File) -> Self {
-//        let name = file.name();
-//        let file_type = file.type_();
-//        let size = file.size();
-//        Self {
-//            id: NEXT_ID.fetch_add(1, Ordering::Relaxed),
-//            name,
-//            file_type,
-//            size,
-//        }
-//    }
-//}
-
 #[component]
 pub fn UploadZone(drop_zone: NodeRef<Div>, client: Client) -> impl IntoView {
-    //let add_files = NodeRef::<Input>::new();
-    //let file_handler = move |_| {
-    //add_files.get();
-    //let files = add_files.files.expect("Should be mounted").value();
-    //};
-    let input_ref = NodeRef::<Input>::new();
+    let file_input = NodeRef::<Input>::new();
     let file_handler = move |_| {
-        let files = input_ref.get().unwrap().files().unwrap();
+        let filelist = match file_input.get() {
+            Some(element) => match element.files() {
+                Some(filelist) => {
+                    // TODO: Implemeting to iter
+                    filelist.into_cloneable;
+                }
+                None => {}
+            },
+            None => {}
+        };
+
+        let files = file_input.get().unwrap().files().unwrap();
         let length = files.length();
         for f in 0..length {
             logging::log!("Index: {}", f);
@@ -87,7 +59,7 @@ pub fn UploadZone(drop_zone: NodeRef<Div>, client: Client) -> impl IntoView {
 
                // <input type="file" multiple on:drop=drop_handler class="btn btn-neutral"/>
 
-               <input type="file" node_ref=input_ref multiple on:change=file_handler
+               <input type="file" node_ref=file_input multiple on:change=file_handler
            //class="btn btn-neutral"
           class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
     />
