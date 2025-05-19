@@ -21,7 +21,6 @@ use {
 #[component]
 pub fn HomePage() -> impl IntoView {
     let client = Client::new();
-    let logout_action = ServerAction::<LogoutUser>::new();
     logging::log!("homepage");
 
     let (dropped, set_dropped) = signal(false);
@@ -90,61 +89,23 @@ pub fn HomePage() -> impl IntoView {
     //
 
     view! {
-        <div class="min-h-screen flex flex-row-reverse border-5 border-accent bg-accent">
-            <div class="border-5 border-error p-10 flex flex-col justify-between bg-base-300">
-                <div>
-                    <Icon icon=icondata::AiApiFilled width="9em" height="9em" />
-                    // <img src=icondata::AiApiFilled/>
-                    <h1 class="text-5xl font-bold">Grimoire</h1>
-                </div>
-
-                <ActionForm action=logout_action>
-                    <input type="submit" value="Logout" class="btn btn-accent mt-4 w-full" />
-                </ActionForm>
-            </div>
-
-            // div for Main content
-            // "Main content"
+        <div class="min-h-screen max-w-screen flex flex-row-reverse border-5 border-accent bg-accent">
+            //<div class="border-5 border-error p-10 flex flex-col justify-between bg-base-300">
+            //    <div>
+            //        <Icon icon=icondata::AiApiFilled width="9em" height="9em" />
+            //        // <img src=icondata::AiApiFilled/>
+            //        <h1 class="text-5xl font-bold">Grimoire</h1>
+            //    </div>
+            //
+            //    <ActionForm action=logout_action>
+            //        <input type="submit" value="Logout" class="btn btn-accent mt-4 w-full" />
+            //    </ActionForm>
+            //</div>
+        <Sidebar/>
             <div class="border-5 border-secondary flex flex-col w-screen bg-secondary">
-                // div around drop zone
-
                 <UploadZone drop_zone=drop_zone_el dropped hover=is_over_drop_zone />
-                // <div class="border-dashed border-5 bg-base-100 p-20 border border-secondary glass grow-1">
-                // <p class="text-5xl">DROP FILES</p>
-                // </div>
-                // div aroun table
-                <div class="border-4 border-primary bg- grow-5">
-                    <table class="table bg-base-300">
-                        <thead>
-                            <tr>
-                                <th>
-                                    <label>
-                                        <input type="checkbox" class="checkbox" />
-                                    </label>
-                                </th>
-                                <th>Name</th>
-                                <td>Type</td>
-                                <td>Size</td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <For each=move || client.store.0.entries() key=|file| file.id().get() let:file>
-                                <FileRow client file />
-                            </For>
-
-                            <tr class="hover:bg-base-300">
-                                <td>
-                                    <label>
-                                        <input type="checkbox" class="checkbox" />
-                                    </label>
-                                </td>
-                                <td>1Cy Ganderton</td>
-                                <td>Quality Control Specialist</td>
-                                <td>Blue</td>
-                            </tr>
-
-                        </tbody>
-                    </table>
+                <div class="border-4 grow-5">
+                    <Table client />
                 </div>
                 <div class="border-4 border-accent">
                     "Action div only visable when something is selected"
@@ -155,7 +116,64 @@ pub fn HomePage() -> impl IntoView {
 }
 
 #[component]
+fn Sidebar(client: Client) -> impl IntoView {
+    let logout_action = ServerAction::<LogoutUser>::new();
+
+    view! {
+        <div class="border-5 border-error p-10 flex flex-col justify-between bg-base-300">
+            <div>
+                <Icon icon=icondata::AiApiFilled width="9em" height="9em" />
+                <h1 class="text-5xl font-bold">Grimoire</h1>
+            </div>
+
+            <ActionForm action=logout_action>
+                <input type="submit" value="Logout" class="btn btn-accent mt-4 w-full" />
+            </ActionForm>
+        </div>
+    }
+}
+
+#[component]
+fn Table(client: Client) -> impl IntoView {
+    view! {
+        <table class="table table-pin-rows">
+            <TableHeader />
+            <tbody>
+                <For each=move || client.store.0.entries() key=|file| file.id().get() let:file>
+                    <FileRow client file />
+                </For>
+            </tbody>
+        </table>
+    }
+}
+#[component]
+fn TableHeader() -> impl IntoView {
+    view! {
+        <thead>
+            <tr>
+                <th>
+                    <label>
+                        <input type="checkbox" class="checkbox" />
+                    </label>
+                </th>
+                <th>Filename</th>
+                <td>Filetype</td>
+                <td>Size</td>
+                <td>Status</td>
+                <td>Actions</td>
+            </tr>
+        </thead>
+    }
+}
+
+#[component]
 fn FileRow(client: Client, #[prop(into)] file: Field<FileEntry>) -> impl IntoView {
+    let remove_handler = move |_| {
+        client.update(Message::Remove {
+            id: file.id().get(),
+        })
+    };
+
     view! {
         <tr class="hover:bg-neutral">
             <td>
@@ -165,7 +183,13 @@ fn FileRow(client: Client, #[prop(into)] file: Field<FileEntry>) -> impl IntoVie
             </td>
             <td>{file.name()}</td>
             <td>{file.file_type()}</td>
+            <td>{file.get().format_size()}</td>
             <td>{file.size()}</td>
+            <td>
+                <button class="btn" on:click=remove_handler>
+                    "X"
+                </button>
+            </td>
         </tr>
     }
 }
