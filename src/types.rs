@@ -101,4 +101,16 @@ impl FileEntry {
             size,
         }
     }
+    pub fn format_size(&self) -> String {
+        const KB: u64 = 1024;
+        const MB: u64 = KB * 1024;
+        const GB: u64 = MB * 1024;
+
+        match self.size {
+            b if b >= GB => format!("{:.2} GB", b as f64 / GB as f64),
+            b if b >= MB => format!("{:.2} MB", b as f64 / MB as f64),
+            b if b >= KB => format!("{:.2} KB", b as f64 / KB as f64),
+            b => format!("{} B", b),
+        }
+    }
 }
