@@ -1,8 +1,10 @@
+use icondata;
 use leptos::{html::Div, prelude::*};
+use leptos_icons::Icon;
 
 //#[derive(Store)]
 //pub struct UploadTable {
-//    #[store(key: usize = |file| file.id)]
+//    #[storerkey: usize = |file| file.id)]
 //    pub files: Vec<FileUpload>,
 //}
 //
@@ -35,16 +37,25 @@ use leptos::{html::Div, prelude::*};
 //}
 
 #[component]
-pub fn UploadZone(
-    drop_zone: NodeRef<Div>,
-    dropped: ReadSignal<bool>,
-    hover: Signal<bool>,
-) -> impl IntoView {
+pub fn UploadZone(drop_zone: NodeRef<Div>) -> impl IntoView {
     view! {
-        <div node_ref=drop_zone class="border-dashed h-64 border-5 border-info grow-2 bg-error">
-            <p class="text-5xl">DROP FILES uploadzone</p>
-            <div>Dropped: {dropped}</div>
-            <div>is_over_drop_zone: {hover}</div>
+        <div
+            node_ref=drop_zone
+            class=" relative w-full min-h-64 border-2 border-dashed transition-all duration-300
+            flex  flex-col items-center justify-center text-center select-none cursor-pointer rounded-2xl
+            group px-6 bg-base-100 space-y-2
+            hover:shadow-lg hover:bg-base-200 hover:border-primary text-base-content
+            "
+        >
+            //<div class="space-y-2">
+                <Icon icon=icondata::FiFilePlus width="5em" height="5em" />
+                //<div class="text-6xl">ICON</div>
+                <h2 class="text-2xl font-semibold">Upload your files</h2>
+                <p class="text-sm opacity-60">
+                    <span class="underline">Click to browse</span>
+                    or drag & drop them here
+                </p>
+            //</div>
         </div>
     }
 }
