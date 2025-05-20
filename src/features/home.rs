@@ -23,7 +23,7 @@ pub fn HomePage() -> impl IntoView {
     let client = Client::new();
     logging::log!("homepage");
 
-    let (dropped, set_dropped) = signal(false);
+    let (_dropped, set_dropped) = signal(false);
 
     let drop_zone_el = NodeRef::<Div>::new();
 
@@ -37,7 +37,7 @@ pub fn HomePage() -> impl IntoView {
     //};
 
     let UseDropZoneReturn {
-        is_over_drop_zone,
+        is_over_drop_zone: _,
         files,
     } = use_drop_zone_with_options(
         drop_zone_el,
@@ -92,7 +92,7 @@ pub fn HomePage() -> impl IntoView {
         <div class="h-screen flex flex-row-reverse border-5 border-accent bg-base-100">
             <Sidebar />
             <div class="border-5 w-screen border-secondary flex flex-col">
-                <UploadZone drop_zone=drop_zone_el dropped hover=is_over_drop_zone />
+                <UploadZone drop_zone=drop_zone_el client />
                 <div class="border-4 grow-3 overflow-auto">
                     <Table client />
                 </div>
@@ -173,7 +173,9 @@ fn FileRow(client: Client, #[prop(into)] file: Field<FileEntry>) -> impl IntoVie
             <td>{file.name()}</td>
             <td>{file.file_type()}</td>
             <td>{file.get().format_size()}</td>
-            <td><div class="badge badge-neutral">Pending</div></td>
+            <td>
+                <div class="badge badge-neutral">Pending</div>
+            </td>
             <td>
                 <button class="btn" on:click=remove_handler>
                     "X"
