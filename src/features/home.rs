@@ -1,21 +1,12 @@
-//use leptos::leptos_dom::logging::console_log;
-
-//use crate::features::upload::UploadTable;
-
 use crate::types::{Client, FileEntry, FileEntryStoreFields, FilesStoreFields, Message};
 use reactive_stores::Field;
 
-use super::{
-    auth::LogoutUser,
-    upload::UploadZone,
-    //upload::{FileUpload, FileUploadStoreFields, UploadTableStoreFields, UploadZone},
-};
+use super::{auth::LogoutUser, upload::UploadZone};
 use {
     icondata,
     leptos::{html::Div, logging, prelude::*},
     leptos_icons::Icon,
     leptos_use::{use_drop_zone_with_options, UseDropZoneOptions, UseDropZoneReturn},
-    //reactive_stores::{Field, Store},
 };
 
 #[component]
@@ -26,15 +17,6 @@ pub fn HomePage() -> impl IntoView {
     let (_dropped, set_dropped) = signal(false);
 
     let drop_zone_el = NodeRef::<Div>::new();
-
-    //let files_dropped = move || {
-    //    if !files.get().is_empty() {
-    //        let _ = files.get().iter().for_each(|drop| {
-    //            let file = FileEntry::from(drop);
-    //            client.update(Message::Add { entry: file });
-    //        });
-    //    };
-    //};
 
     let UseDropZoneReturn {
         is_over_drop_zone: _,
@@ -59,34 +41,6 @@ pub fn HomePage() -> impl IntoView {
             }
         };
     });
-
-    //let upload_data: Store<UploadTable> = Store::new(UploadTable::default());
-    //let upload_store = Store::new(UploadTable {
-    //    files: (move || {
-    //        files
-    //            .get()
-    //            .iter()
-    //            .map(|file| FileUpload::from_web_sys(file))
-    //            .collect::<Vec<FileUpload>>()
-    //    })(),
-    //});
-    //
-    //Effect::new(move || {
-    //    let dropped_files = files.get();
-    //    if !dropped_files.is_empty() {
-    //        let files = dropped_files
-    //            .iter()
-    //            .map(|file| {
-    //                logging::log!("{}", file.name());
-    //                FileUpload::from_web_sys(file)
-    //            })
-    //            .collect::<Vec<FileUpload>>();
-    //        for file in files {
-    //            upload_data.files().write().push(file);
-    //        }
-    //    }
-    //});
-    //
 
     view! {
         <div class="h-screen flex flex-row-reverse border-5 border-accent bg-base-100">
