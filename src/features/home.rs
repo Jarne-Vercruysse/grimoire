@@ -1,21 +1,12 @@
-//use leptos::leptos_dom::logging::console_log;
-
-//use crate::features::upload::UploadTable;
-
 use crate::types::{Client, FileEntry, FileEntryStoreFields, FilesStoreFields, Message};
 use reactive_stores::Field;
 
-use super::{
-    auth::LogoutUser,
-    upload::UploadZone,
-    //upload::{FileUpload, FileUploadStoreFields, UploadTableStoreFields, UploadZone},
-};
+use super::{auth::LogoutUser, upload::UploadZone};
 use {
     icondata,
     leptos::{html::Div, logging, prelude::*},
     leptos_icons::Icon,
     leptos_use::{use_drop_zone_with_options, UseDropZoneOptions, UseDropZoneReturn},
-    //reactive_stores::{Field, Store},
 };
 
 #[component]
@@ -26,15 +17,6 @@ pub fn HomePage() -> impl IntoView {
     let (_dropped, set_dropped) = signal(false);
 
     let drop_zone_el = NodeRef::<Div>::new();
-
-    //let files_dropped = move || {
-    //    if !files.get().is_empty() {
-    //        let _ = files.get().iter().for_each(|drop| {
-    //            let file = FileEntry::from(drop);
-    //            client.update(Message::Add { entry: file });
-    //        });
-    //    };
-    //};
 
     let UseDropZoneReturn {
         is_over_drop_zone: _,
@@ -60,45 +42,31 @@ pub fn HomePage() -> impl IntoView {
         };
     });
 
-    //let upload_data: Store<UploadTable> = Store::new(UploadTable::default());
-    //let upload_store = Store::new(UploadTable {
-    //    files: (move || {
-    //        files
-    //            .get()
-    //            .iter()
-    //            .map(|file| FileUpload::from_web_sys(file))
-    //            .collect::<Vec<FileUpload>>()
-    //    })(),
-    //});
-    //
-    //Effect::new(move || {
-    //    let dropped_files = files.get();
-    //    if !dropped_files.is_empty() {
-    //        let files = dropped_files
-    //            .iter()
-    //            .map(|file| {
-    //                logging::log!("{}", file.name());
-    //                FileUpload::from_web_sys(file)
-    //            })
-    //            .collect::<Vec<FileUpload>>();
-    //        for file in files {
-    //            upload_data.files().write().push(file);
-    //        }
-    //    }
-    //});
-    //
-
     view! {
-        <div class="h-screen flex flex-row-reverse border-5 border-accent bg-base-100">
+        <div class="h-screen flex flex-row-reverse bg-base-100">
             <Sidebar />
-            <div class="border-5 w-screen border-secondary flex flex-col">
+            <div class="flex-1 flex flex-col overflow-hidden">
                 <UploadZone drop_zone=drop_zone_el client />
-                <div class="border-4 grow-3 overflow-auto">
+                <div class="overflow-auto px-6 pb-28">
                     <Table client />
                 </div>
-                <div class="border-4 border-accent">
-                    "Action div only visable when something is selected"
-                </div>
+                // <div class="sticky bottom-0 left-0 w-full bg-base-300 p-4 shadow-md flex justify-end items-center transition-opacity duration-300">
+                // <button class="btn btn-primary">Download Selected</button>
+                // </div>
+                <ActionBar />
+            </div>
+        </div>
+    }
+}
+
+#[component]
+fn ActionBar() -> impl IntoView {
+    view! {
+        <div class="fixed bottom-0 right-64 w-full z-50 bg-base-300 p-4 border-t border-base-100 shadow-md">
+            // class="w-full bg-base-300 p-4 border-t border-base-100 shadow-md z-50"
+            // class:hidden=!(selected_files.get().len() > 0) // Leptos reactive visibility
+            <div class="max-w-screen-xl mx-auto flex justify-start">
+                <button class="btn btn-primary">Download Selected</button>
             </div>
         </div>
     }
@@ -109,14 +77,49 @@ fn Sidebar() -> impl IntoView {
     let logout_action = ServerAction::<LogoutUser>::new();
 
     view! {
-        <div class="border-5 border-error p-4 w-64 flex flex-col justify-between bg-base-300">
-            <div>
+        <div class="w-64 bg-base-300 p-6 flex flex-col justify-between">
+            <div class="text-center space-y-4">
                 <Icon icon=icondata::AiApiFilled width="9em" height="9em" />
-                <h1 class="text-5xl font-bold">Grimoire</h1>
+                // <img src="/logo.svg" alt="Grimoire Logo" class="mx-auto h-12" />
+                <h1 class="text-2xl font-bold text-base-content">Grimoire</h1>
             </div>
+            <label class="toggle text-base-content">
+                <input type="checkbox" value="smartburn" class="theme-controller" />
+                <svg aria-label="moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <g
+                        stroke-linejoin="round"
+                        stroke-linecap="round"
+                        stroke-width="2"
+                        fill="none"
+                        stroke="currentColor"
+                    >
+                        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+                    </g>
+                </svg>
+                <svg aria-label="sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <g
+                        stroke-linejoin="round"
+                        stroke-linecap="round"
+                        stroke-width="2"
+                        fill="none"
+                        stroke="currentColor"
+                    >
+                        <circle cx="12" cy="12" r="4"></circle>
+                        <path d="M12 2v2"></path>
+                        <path d="M12 20v2"></path>
+                        <path d="m4.93 4.93 1.41 1.41"></path>
+                        <path d="m17.66 17.66 1.41 1.41"></path>
+                        <path d="M2 12h2"></path>
+                        <path d="M20 12h2"></path>
+                        <path d="m6.34 17.66-1.41 1.41"></path>
+                        <path d="m19.07 4.93-1.41 1.41"></path>
+                    </g>
+                </svg>
+
+            </label>
 
             <ActionForm action=logout_action>
-                <input type="submit" value="Logout" class="btn btn-accent mt-4 w-full" />
+                <input type="submit" value="Logout" class="btn btn-error btn-block mt-4" />
             </ActionForm>
         </div>
     }
@@ -125,7 +128,7 @@ fn Sidebar() -> impl IntoView {
 #[component]
 fn Table(client: Client) -> impl IntoView {
     view! {
-        <table class="table table-pin-rows">
+        <table class="table w-full bg-base-100 shadow rounded-box">
             <TableHeader />
             <tbody>
                 <For each=move || client.store.0.entries() key=|file| file.id().get() let:file>
@@ -138,11 +141,11 @@ fn Table(client: Client) -> impl IntoView {
 #[component]
 fn TableHeader() -> impl IntoView {
     view! {
-        <thead>
+        <thead class="bg-base-300 text-base-content">
             <tr>
                 <th>
                     <label>
-                        <input type="checkbox" class="checkbox" />
+                        <input type="checkbox" class="checkbox-sm checkbox" />
                     </label>
                 </th>
                 <th>Filename</th>
@@ -167,7 +170,7 @@ fn FileRow(client: Client, #[prop(into)] file: Field<FileEntry>) -> impl IntoVie
         <tr class="hover:bg-base-200">
             <td>
                 <label>
-                    <input type="checkbox" class="checkbox" />
+                    <input type="checkbox" class="checkbox checkbox-sm" />
                 </label>
             </td>
             <td>{file.name()}</td>
@@ -177,8 +180,12 @@ fn FileRow(client: Client, #[prop(into)] file: Field<FileEntry>) -> impl IntoVie
                 <div class="badge badge-neutral">Pending</div>
             </td>
             <td>
-                <button class="btn" on:click=remove_handler>
-                    "X"
+                <button class="btn btn-sm btn-outline" on:click=remove_handler>
+                    "Delete"
+                </button>
+
+                <button class="btn btn-sm btn-outline" on:click=remove_handler>
+                    "Download"
                 </button>
             </td>
         </tr>

@@ -38,30 +38,31 @@ pub fn UploadZone(drop_zone: NodeRef<Div>, client: Client) -> impl IntoView {
             }
         };
     };
-
     view! {
-        <div
-            node_ref=drop_zone
-            class=" relative w-full min-h-64 border-2 border-dashed transition-all duration-300
-            flex  flex-col items-center justify-center text-center select-none cursor-pointer rounded-2xl
-            group px-6 bg-base-100 space-y-2
-            hover:shadow-lg hover:bg-base-200 hover:border-primary text-base-content
-            "
-        >
-            <Icon icon=icondata::FiFilePlus width="5em" height="5em" />
-            <h2 class="text-2xl font-semibold">Upload your files</h2>
-            <p class="text-sm opacity-60">
-                <span class="underline">Click to browse</span>
-                or drag & drop them here
-            </p>
+        <div class="p-6">
+            <div
+                node_ref=drop_zone
+                class=" relative
+                border-2 border-dashed border-base-content/40 bg-base-100 rounded-xl h-64 flex flex-col justify-center items-center text-center space-y-2 hover:bg-base-200 transition
+                "
+            >
+                <svg class="w-12 h-12 text-primary" fill="none" stroke="currentColor">
+                    <Icon icon=icondata::FiFilePlus width="2em" height="2em" />
+                </svg>
+                <h2 class="text-lg font-semibold text-base-content">Upload your files</h2>
+                <p class="text-sm text-base-content/70">
+                    <span class="underline">Click to browse</span>
+                    or drag & drop them here
+                </p>
 
-            <input
-                type="file"
-                node_ref=file_input
-                multiple
-                on:change=file_handler
-                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-            />
+                <input
+                    type="file"
+                    node_ref=file_input
+                    multiple
+                    on:change=file_handler
+                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+            </div>
         </div>
     }
 }

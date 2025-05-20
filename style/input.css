@@ -1,7 +1,8 @@
 @import "tailwindcss";
 
 @plugin "./daisyui.js" {
-  themes:
-    emerald --default,
-    coffee;
+  themes: emerald, synthwave, coffee;
 }
+
+@import "./themes/chaoticpup.css";
+@import "./themes/smartburn.css";
