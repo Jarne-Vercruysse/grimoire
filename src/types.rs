@@ -1,7 +1,6 @@
 use std::u8;
 
 use leptos::prelude::*;
-use leptos::wasm_bindgen;
 use leptos::web_sys::File;
 use reactive_stores::{ArcStore, Field, Store, StoreFieldIterator};
 use serde::{Deserialize, Serialize};
@@ -107,7 +106,7 @@ impl FileEntry {
         let name = file.name();
         let file_type = file.type_();
         let size = file.size() as u64;
-        let content = read_bytes(file);
+        let content = Vec::new();
 
         Self {
             id,
@@ -116,6 +115,9 @@ impl FileEntry {
             size,
             content,
         }
+    }
+    pub fn update_content(&mut self, content: Vec<u8>) {
+        self.content = content;
     }
 
     pub fn format_size(&self) -> String {
