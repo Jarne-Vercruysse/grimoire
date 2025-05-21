@@ -1,4 +1,7 @@
-use crate::types::{Client, FileEntry, FileEntryStoreFields, FilesStoreFields, Message};
+use crate::{
+    func::{bytes_to_blob, download_link},
+    types::{Client, FileEntry, FileEntryStoreFields, FilesStoreFields, Message},
+};
 use reactive_stores::Field;
 
 use super::{auth::LogoutUser, upload::UploadZone};
@@ -6,7 +9,7 @@ use {
     icondata,
     leptos::{html::Div, logging, prelude::*},
     leptos_icons::Icon,
-    leptos_use::{use_drop_zone_with_options, UseDropZoneOptions, UseDropZoneReturn},
+    leptos_use::{UseDropZoneOptions, UseDropZoneReturn, use_drop_zone_with_options},
 };
 
 #[component]
@@ -160,6 +163,9 @@ fn TableHeader() -> impl IntoView {
 
 #[component]
 fn FileRow(client: Client, #[prop(into)] file: Field<FileEntry>) -> impl IntoView {
+    let blob = bytes_to_blob(&file.get_untracked());
+    let url = download_link(blob);
+    //let (link, set_link) = signal(download_link(bytes_to_blob(client.store.0.)));
     let remove_handler = move |_| {
         client.update(Message::Remove {
             id: file.id().get(),
@@ -184,9 +190,9 @@ fn FileRow(client: Client, #[prop(into)] file: Field<FileEntry>) -> impl IntoVie
                     "Delete"
                 </button>
 
-                <button class="btn btn-sm btn-outline" on:click=remove_handler>
+                <a href=url download class="btn btn-sm btn-outline" on:click=remove_handler>
                     "Download"
-                </button>
+                </a>
             </td>
         </tr>
     }

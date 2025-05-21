@@ -1,5 +1,6 @@
 pub mod app;
 pub mod features;
+pub mod func;
 pub mod types;
 
 #[cfg(feature = "hydrate")]

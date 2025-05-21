@@ -1,3 +1,4 @@
+use crate::types::{Client, FileEntry, Message};
 use icondata;
 use leptos::{
     html::{Div, Input},
@@ -6,8 +7,6 @@ use leptos::{
 };
 use leptos_icons::Icon;
 
-use crate::types::{Client, FileEntry, Message};
-
 #[component]
 pub fn UploadZone(drop_zone: NodeRef<Div>, client: Client) -> impl IntoView {
     let file_input = NodeRef::<Input>::new();
@@ -15,7 +14,6 @@ pub fn UploadZone(drop_zone: NodeRef<Div>, client: Client) -> impl IntoView {
         let _files = match file_input.get() {
             Some(element) => match element.files() {
                 Some(filelist) => {
-                    // TODO: Implemeting to iter
                     let lists_length = filelist.length();
                     for index in 0..lists_length {
                         match filelist.item(index) {
@@ -38,6 +36,7 @@ pub fn UploadZone(drop_zone: NodeRef<Div>, client: Client) -> impl IntoView {
             }
         };
     };
+
     view! {
         <div class="p-6">
             <div

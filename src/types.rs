@@ -1,8 +1,15 @@
+use std::u8;
+
 use leptos::prelude::*;
+use leptos::wasm_bindgen;
 use leptos::web_sys::File;
 use reactive_stores::{ArcStore, Field, Store, StoreFieldIterator};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+
+use crate::func::bytes_to_blob;
+use crate::func::download_link;
+use crate::func::read_bytes;
 
 #[derive(Debug, Default, Clone, Store, PartialEq, Eq)]
 pub struct Files {
@@ -16,6 +23,7 @@ pub struct FileEntry {
     pub name: String,
     pub file_type: String,
     pub size: u64,
+    pub content: Vec<u8>,
 }
 
 #[derive(Debug, Clone, Store, PartialEq, Eq, Serialize, Deserialize)]
@@ -27,6 +35,7 @@ pub enum Message {
     Remove { id: Uuid },
     MarkComplete { id: Uuid, completed: bool },
     Edit { id: Uuid, entry: FileEntry },
+    Download { id: Uuid },
 }
 
 #[derive(Debug, Default, Clone, Copy)]
@@ -72,6 +81,11 @@ impl State {
             .position(|file| &file.id == id)
             .map(|idx| self.0.entries().at_unkeyed(idx).into())
     }
+
+    pub fn trigger_download(&self, id: &Uuid) -> String {
+        let file = self.find(id).unwrap();
+        download_link(bytes_to_blob(&file.get_untracked()).into())
+    }
 }
 
 impl Client {
@@ -93,14 +107,17 @@ impl FileEntry {
         let name = file.name();
         let file_type = file.type_();
         let size = file.size() as u64;
+        let content = read_bytes(file);
 
         Self {
             id,
             name,
             file_type,
             size,
+            content,
         }
     }
+
     pub fn format_size(&self) -> String {
         const KB: u64 = 1024;
         const MB: u64 = KB * 1024;
