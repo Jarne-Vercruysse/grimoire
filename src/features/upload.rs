@@ -1,47 +1,76 @@
-use std::{cell::RefCell, collections::HashMap, rc::Rc};
+use std::collections::HashMap;
 
-use crate::types::Client;
+#[cfg(feature = "ssr")]
+use super::storage::save_uploaded_file;
+use crate::types::Message;
+use crate::types::{Client, FileEntry};
 use gloo::file::{
-    File, FileList,
+    FileList,
     callbacks::{self, FileReader},
 };
 use icondata;
+use leptos::task::spawn_local;
+use leptos::web_sys::FormData;
 use leptos::{
     html::{Div, Input},
     logging,
     prelude::*,
 };
 use leptos_icons::Icon;
+use server_fn::codec::{MultipartData, MultipartFormData};
 
-// pub async fn upload_files(mut multipart: Multipart) -> impl IntoResponse {
-//     while let Some(field) = multipart.next_field().await.unwrap() {
-//         let name = field.name().unwrap();
-//         println!("Uploading a file: {}", name);
-//     }
-//     StatusCode::OK
-// }
+#[server(input=MultipartFormData,)]
+pub async fn upload_file(data: MultipartData) -> Result<(), ServerFnError> {
+    // `.into_inner()` returns the inner `multer` stream
+    // it is `None` if we call this on the client, but always `Some(_)` on the server, so is safe to
+    // unwrap
+    let mut data = data.into_inner().unwrap();
+
+    // this will just measure the total number of bytes uploaded
+    while let Ok(Some(field)) = data.next_field().await {
+        println!("\n[NEXT FIELD]\n");
+        let name = field.file_name().unwrap_or_default().to_string();
+        println!("  [NAME] {name}");
+        let mime = field.content_type().unwrap().to_string();
+        println!("  [MIME] {mime}");
+        let bytes = field.bytes().await?;
+        let path = save_uploaded_file(name, bytes.to_vec()).await.unwrap();
+        println!("  [PATH] {path}");
+    }
+
+    Ok(())
+}
 
 #[component]
 pub fn UploadZone(drop_zone: NodeRef<Div>, client: Client) -> impl IntoView {
     let file_input = NodeRef::<Input>::new();
-    //let readers: Rc<RefCell<Vec<FileReader>>> = Rc::new(RefCell::new(Vec::new()));
-
-    //let (readers, set_readers) = signal(Vec::<FileReader>::new());
-    //let readers: HashMap<String, FileReader> = HashMap::new();
-    //let (messages, set_messages) = signal(Vec::<String>::new());
-    let (readers, set_readers) = signal_local(HashMap::<String, FileReader>::new());
+    let (_, set_readers) = signal_local(HashMap::<String, FileReader>::new());
 
     let file_handler = move |_| {
         let files = FileList::from(file_input.get().unwrap().files().unwrap());
+
         logging::log!("Will read {} files", files.len());
         files.iter().for_each(move |blob| {
-            //logging::log!("type = {}", std::any::type_name_of_val(blob));
-            //logging::log!("file: name = {}, size = {}", blob.name(), blob.size());
+            let file = blob.clone();
             let reader = callbacks::read_as_bytes(blob, move |result| {
                 logging::log!("Callback fired");
                 match result {
                     Ok(bytes) => {
-                        logging::log!("bytes: {}", bytes.len())
+                        logging::log!("bytes: {}", bytes.len());
+                        let entry = FileEntry::from(file.clone(), bytes);
+                        client.update(Message::Add { entry });
+
+                        // FIX: Should move this out of the callback
+                        let form = FormData::new().unwrap();
+                        form.append_with_blob_and_filename(
+                            "file",
+                            AsRef::<leptos::web_sys::Blob>::as_ref(&file),
+                            &file.name(),
+                        )
+                        .unwrap();
+                        spawn_local(async move {
+                            let _ = upload_file(form.into()).await;
+                        });
                     }
                     Err(err) => {
                         logging::log!("Err: {}", err)

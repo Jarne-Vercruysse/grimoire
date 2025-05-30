@@ -68,13 +68,13 @@ impl State {
         }
     }
 
-    fn find(&self, id: &Uuid) -> Option<Field<FileEntry>> {
-        let store = self.0.entries().read_untracked();
-        store
-            .iter()
-            .position(|file| &file.id == id)
-            .map(|idx| self.0.entries().at_unkeyed(idx).into())
-    }
+    // fn find(&self, id: &Uuid) -> Option<Field<FileEntry>> {
+    //     let store = self.0.entries().read_untracked();
+    //     store
+    //         .iter()
+    //         .position(|file| &file.id == id)
+    //         .map(|idx| self.0.entries().at_unkeyed(idx).into())
+    // }
 }
 
 impl Client {
@@ -91,12 +91,11 @@ impl Client {
 }
 
 impl FileEntry {
-    pub fn from(file: &gloo::file::File) -> Self {
+    pub fn from(file: gloo::file::File, content: Vec<u8>) -> Self {
         let id = Uuid::new_v4();
         let name = file.name();
         let file_type = file.raw_mime_type();
         let size = file.size() as u64;
-        let content = Vec::new();
 
         Self {
             id,
@@ -106,6 +105,7 @@ impl FileEntry {
             content,
         }
     }
+
     pub fn update_content(&mut self, content: Vec<u8>) {
         self.content = content;
     }

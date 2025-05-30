@@ -37,7 +37,10 @@ pub fn HomePage() -> impl IntoView {
     //         let files = files
     //             .get()
     //             .iter()
-    //             .map(|drop| FileEntry::from(drop))
+    //             .map(|drop| {
+    //                 let file = gloo::file::File::from(drop);
+    //                 FileEntry::from(file)
+    //             })
     //             .collect::<Vec<FileEntry>>();
     //         for file in files {
     //             client.update(Message::Add { entry: file });
@@ -141,6 +144,7 @@ fn Table(client: Client) -> impl IntoView {
         </table>
     }
 }
+
 #[component]
 fn TableHeader() -> impl IntoView {
     view! {
@@ -181,7 +185,7 @@ fn FileRow(client: Client, #[prop(into)] file: Field<FileEntry>) -> impl IntoVie
             </td>
             <td>{file.name()}</td>
             <td>{file.file_type()}</td>
-            <td>{file.get().format_size()}</td>
+            <td>{move ||file.get().format_size()}</td>
             <td>
                 <div class="badge badge-neutral">Pending</div>
             </td>
