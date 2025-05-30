@@ -31,19 +31,19 @@ pub fn HomePage() -> impl IntoView {
             .on_enter(move |_| set_dropped(false)),
     );
 
-    Effect::new(move || {
-        let _ = files.get();
-        if !files.get().is_empty() {
-            let files = files
-                .get()
-                .iter()
-                .map(|drop| FileEntry::from(drop))
-                .collect::<Vec<FileEntry>>();
-            for file in files {
-                client.update(Message::Add { entry: file });
-            }
-        };
-    });
+    // Effect::new(move || {
+    //     let _ = files.get();
+    //     if !files.get().is_empty() {
+    //         let files = files
+    //             .get()
+    //             .iter()
+    //             .map(|drop| FileEntry::from(drop))
+    //             .collect::<Vec<FileEntry>>();
+    //         for file in files {
+    //             client.update(Message::Add { entry: file });
+    //         }
+    //     };
+    // });
 
     view! {
         <div class="h-screen flex flex-row-reverse bg-base-100">

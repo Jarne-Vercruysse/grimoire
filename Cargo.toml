@@ -22,7 +22,7 @@ serde = { version = "1.0", features = ["derive"] }
 uuid = { version = "1.16.0", features = ["v4", "js", "serde"] }
 sqlx = { version = "0.8", features = [ "runtime-tokio","postgres","migrate","uuid" ], optional = true }
 leptos-use = { version = "0.16.0-beta", default-features = false, features = ["use_drop_zone"]}
-web-sys = { version = "0.3", features = ["FilePropertyBag"] }
+gloo = {version = "0.11.0", default-features = false, features= ["file", "net"]}
 
 [features]
 hydrate = [

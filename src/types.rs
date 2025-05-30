@@ -1,14 +1,9 @@
 use std::u8;
 
 use leptos::prelude::*;
-use leptos::web_sys::File;
 use reactive_stores::{ArcStore, Field, Store, StoreFieldIterator};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-
-use crate::func::bytes_to_blob;
-use crate::func::download_link;
-use crate::func::read_bytes;
 
 #[derive(Debug, Default, Clone, Store, PartialEq, Eq)]
 pub struct Files {
@@ -80,11 +75,6 @@ impl State {
             .position(|file| &file.id == id)
             .map(|idx| self.0.entries().at_unkeyed(idx).into())
     }
-
-    pub fn trigger_download(&self, id: &Uuid) -> String {
-        let file = self.find(id).unwrap();
-        download_link(bytes_to_blob(&file.get_untracked()).into())
-    }
 }
 
 impl Client {
@@ -101,10 +91,10 @@ impl Client {
 }
 
 impl FileEntry {
-    pub fn from(file: &File) -> Self {
+    pub fn from(file: &gloo::file::File) -> Self {
         let id = Uuid::new_v4();
         let name = file.name();
-        let file_type = file.type_();
+        let file_type = file.raw_mime_type();
         let size = file.size() as u64;
         let content = Vec::new();
 

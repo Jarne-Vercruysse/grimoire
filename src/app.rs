@@ -1,10 +1,11 @@
 use {
     super::features::*,
     leptos::prelude::*,
-    leptos_meta::{provide_meta_context, MetaTags, Stylesheet, Title},
+    leptos_meta::{MetaTags, Stylesheet, Title, provide_meta_context},
     leptos_router::{
-        components::{Route, Router, Routes},
         StaticSegment,
+        components::{Route, Router, Routes},
+        path,
     },
 };
 
