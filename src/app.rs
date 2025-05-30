@@ -5,7 +5,6 @@ use {
     leptos_router::{
         StaticSegment,
         components::{Route, Router, Routes},
-        path,
     },
 };
 

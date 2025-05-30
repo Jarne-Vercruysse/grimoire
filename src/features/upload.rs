@@ -1,5 +1,10 @@
+use std::{cell::RefCell, collections::HashMap, rc::Rc};
+
 use crate::types::Client;
-use gloo::file::{FileList, callbacks};
+use gloo::file::{
+    File, FileList,
+    callbacks::{self, FileReader},
+};
 use icondata;
 use leptos::{
     html::{Div, Input},
@@ -19,17 +24,33 @@ use leptos_icons::Icon;
 #[component]
 pub fn UploadZone(drop_zone: NodeRef<Div>, client: Client) -> impl IntoView {
     let file_input = NodeRef::<Input>::new();
+    //let readers: Rc<RefCell<Vec<FileReader>>> = Rc::new(RefCell::new(Vec::new()));
+
+    //let (readers, set_readers) = signal(Vec::<FileReader>::new());
+    //let readers: HashMap<String, FileReader> = HashMap::new();
+    //let (messages, set_messages) = signal(Vec::<String>::new());
+    let (readers, set_readers) = signal_local(HashMap::<String, FileReader>::new());
 
     let file_handler = move |_| {
         let files = FileList::from(file_input.get().unwrap().files().unwrap());
+        logging::log!("Will read {} files", files.len());
         files.iter().for_each(move |blob| {
-            callbacks::read_as_bytes(blob, move |result| match result {
-                Ok(bytes) => {
-                    logging::log!("bytes: {}", bytes.len())
+            //logging::log!("type = {}", std::any::type_name_of_val(blob));
+            //logging::log!("file: name = {}, size = {}", blob.name(), blob.size());
+            let reader = callbacks::read_as_bytes(blob, move |result| {
+                logging::log!("Callback fired");
+                match result {
+                    Ok(bytes) => {
+                        logging::log!("bytes: {}", bytes.len())
+                    }
+                    Err(err) => {
+                        logging::log!("Err: {}", err)
+                    }
                 }
-                Err(err) => {
-                    logging::log!("Err: {}", err)
-                }
+            });
+
+            set_readers.update(|map| {
+                map.insert(blob.name(), reader);
             });
         });
     };
