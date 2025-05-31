@@ -23,7 +23,7 @@ pub fn HomePage() -> impl IntoView {
 
     let UseDropZoneReturn {
         is_over_drop_zone: _,
-        files,
+        files: _,
     } = use_drop_zone_with_options(
         drop_zone_el,
         UseDropZoneOptions::default()
@@ -56,9 +56,6 @@ pub fn HomePage() -> impl IntoView {
                 <div class="overflow-auto px-6 pb-28">
                     <Table client />
                 </div>
-                // <div class="sticky bottom-0 left-0 w-full bg-base-300 p-4 shadow-md flex justify-end items-center transition-opacity duration-300">
-                // <button class="btn btn-primary">Download Selected</button>
-                // </div>
                 <ActionBar />
             </div>
         </div>
@@ -86,7 +83,6 @@ fn Sidebar() -> impl IntoView {
         <div class="w-64 bg-base-300 p-6 flex flex-col justify-between">
             <div class="text-center space-y-4">
                 <Icon icon=icondata::AiApiFilled width="9em" height="9em" />
-                // <img src="/logo.svg" alt="Grimoire Logo" class="mx-auto h-12" />
                 <h1 class="text-2xl font-bold text-base-content">Grimoire</h1>
             </div>
             <label class="toggle text-base-content">
@@ -185,7 +181,7 @@ fn FileRow(client: Client, #[prop(into)] file: Field<FileEntry>) -> impl IntoVie
             </td>
             <td>{file.name()}</td>
             <td>{file.file_type()}</td>
-            <td>{move ||file.get().format_size()}</td>
+            <td>{move || file.get().format_size()}</td>
             <td>
                 <div class="badge badge-neutral">Pending</div>
             </td>
@@ -194,7 +190,8 @@ fn FileRow(client: Client, #[prop(into)] file: Field<FileEntry>) -> impl IntoVie
                     "Delete"
                 </button>
 
-                <a href=url download class="btn btn-sm btn-outline" on:click=remove_handler>
+                // TODO: Make it change the status
+                <a href=url download class="btn btn-sm btn-outline">
                     "Download"
                 </a>
             </td>

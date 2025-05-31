@@ -21,12 +21,8 @@ use server_fn::codec::{MultipartData, MultipartFormData};
 
 #[server(input=MultipartFormData,)]
 pub async fn upload_file(data: MultipartData) -> Result<(), ServerFnError> {
-    // `.into_inner()` returns the inner `multer` stream
-    // it is `None` if we call this on the client, but always `Some(_)` on the server, so is safe to
-    // unwrap
     let mut data = data.into_inner().unwrap();
 
-    // this will just measure the total number of bytes uploaded
     while let Ok(Some(field)) = data.next_field().await {
         println!("\n[NEXT FIELD]\n");
         let name = field.file_name().unwrap_or_default().to_string();
