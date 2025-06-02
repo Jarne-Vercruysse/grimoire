@@ -1,5 +1,6 @@
 use {
     super::features::*,
+    crate::{features::storage::get_files, types::Client},
     leptos::prelude::*,
     leptos_meta::{MetaTags, Stylesheet, Title, provide_meta_context},
     leptos_router::{
@@ -29,6 +30,8 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
 #[component]
 pub fn App() -> impl IntoView {
     provide_meta_context();
+    let files = get_files().await.unwrap();
+    provide_context(Client::new(Files { files }));
 
     view! {
         <Stylesheet id="leptos" href="/pkg/grimoire.css" />

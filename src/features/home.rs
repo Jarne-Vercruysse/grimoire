@@ -14,7 +14,9 @@ use {
 
 #[component]
 pub fn HomePage() -> impl IntoView {
-    let client = Client::new();
+    //let client = Client::new();
+
+    //client.update(Message::Welcome { list: () });
     logging::log!("homepage");
 
     let (_dropped, set_dropped) = signal(false);

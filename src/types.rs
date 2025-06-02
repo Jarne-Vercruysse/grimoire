@@ -5,6 +5,8 @@ use reactive_stores::{ArcStore, Store};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+use crate::features::upload::FileRecord;
+
 #[derive(Debug, Default, Clone, Store, PartialEq, Eq)]
 pub struct Files {
     #[store(key: Uuid = |file| file.id)]
@@ -78,7 +80,7 @@ impl State {
 }
 
 impl Client {
-    pub fn new() -> Self {
+    pub fn new(files: Vec<FileRecord>) -> Self {
         let user = User::default();
         Self {
             user,

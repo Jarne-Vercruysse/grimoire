@@ -2,8 +2,10 @@ use std::collections::HashMap;
 
 #[cfg(feature = "ssr")]
 use super::storage::save_uploaded_file;
+use super::storage::store_in_db;
 use crate::types::Message;
 use crate::types::{Client, FileEntry};
+use chrono;
 use gloo::file::{
     FileList,
     callbacks::{self, FileReader},
@@ -17,21 +19,84 @@ use leptos::{
     prelude::*,
 };
 use leptos_icons::Icon;
+use serde::{Deserialize, Serialize};
 use server_fn::codec::{MultipartData, MultipartFormData};
+use uuid::Uuid;
+
+#[derive(Clone, Serialize, Deserialize)]
+pub struct FileUpload {
+    pub filename: String,
+    pub mime_type: String,
+    pub size: u64,
+    pub data: Vec<u8>,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct FileRecord {
+    pub id: Uuid,
+    pub filename: String,
+    pub mime_type: String,
+    pub size: i32,
+    pub uploaded_at: chrono::NaiveDateTime,
+    pub storage_path: String,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct NewFileRecord {
+    pub id: Uuid,
+    pub filename: String,
+    pub mime_type: String,
+    pub size: i32,
+    pub storage_path: String,
+}
+
+impl NewFileRecord {
+    pub fn new(
+        id: Uuid,
+        filename: String,
+        mime_type: String,
+        size: i32,
+        storage_path: String,
+    ) -> Self {
+        Self {
+            id,
+            filename,
+            mime_type,
+            size,
+            storage_path,
+        }
+    }
+}
 
 #[server(input=MultipartFormData,)]
 pub async fn upload_file(data: MultipartData) -> Result<(), ServerFnError> {
     let mut data = data.into_inner().unwrap();
+    let id = Uuid::new_v4();
 
     while let Ok(Some(field)) = data.next_field().await {
-        println!("\n[NEXT FIELD]\n");
-        let name = field.file_name().unwrap_or_default().to_string();
-        println!("  [NAME] {name}");
-        let mime = field.content_type().unwrap().to_string();
-        println!("  [MIME] {mime}");
+        let file_name = field.file_name().unwrap_or_default().to_string();
+        let mime_type = field.content_type().unwrap().to_string();
         let bytes = field.bytes().await?;
-        let path = save_uploaded_file(name, bytes.to_vec()).await.unwrap();
-        println!("  [PATH] {path}");
+        let size = bytes.len() as i32;
+
+        // TODO: Handle errors
+        let path = save_uploaded_file(file_name.clone(), bytes.to_vec(), id)
+            .await
+            .unwrap();
+
+        logging::log!("File in path: {}", path.clone());
+
+        let file = NewFileRecord::new(id, file_name, mime_type, size, path);
+        let result = store_in_db(file).await;
+
+        match result {
+            Ok(_) => {
+                logging::log!("Stored in DB and in local storage")
+            }
+            Err(_) => {
+                logging::log!("Got this error:")
+            }
+        }
     }
 
     Ok(())
