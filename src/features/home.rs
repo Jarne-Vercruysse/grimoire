@@ -1,4 +1,5 @@
 use crate::{
+    features::storage::get_files,
     func::{bytes_to_blob, download_link},
     types::{Client, FileEntry, FileEntryStoreFields, FilesStoreFields, Message},
 };
@@ -15,6 +16,7 @@ use {
 #[component]
 pub fn HomePage() -> impl IntoView {
     //let client = Client::new();
+    let client = expect_context::<Client>();
 
     //client.update(Message::Welcome { list: () });
     logging::log!("homepage");
@@ -131,13 +133,25 @@ fn Sidebar() -> impl IntoView {
 
 #[component]
 fn Table(client: Client) -> impl IntoView {
+    // let stored_files = Resource::new(
+    //     move || client.store.0.entries().get(),
+    //     |_| async move {
+    //         match get_files().await {
+    //             Ok(files) => Some(files),
+    //             Err(_) => None,
+    //         }
+    //     },
+    // );
+
     view! {
         <table class="table w-full bg-base-100 shadow rounded-box">
             <TableHeader />
             <tbody>
-                <For each=move || client.store.0.entries() key=|file| file.id().get() let:file>
-                    <FileRow client file />
-                </For>
+                <Suspense fallback=move || view! { <p>"Loading..."</p> }>
+                    <For each=move || client.store.0.entries() key=|file| file.id().get() let:file>
+                        <FileRow client file />
+                    </For>
+                </Suspense>
             </tbody>
         </table>
     }

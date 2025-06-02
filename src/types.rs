@@ -80,7 +80,7 @@ impl State {
 }
 
 impl Client {
-    pub fn new(files: Vec<FileRecord>) -> Self {
+    pub fn new() -> Self {
         let user = User::default();
         Self {
             user,
@@ -105,6 +105,15 @@ impl FileEntry {
             file_type,
             size,
             content,
+        }
+    }
+    pub fn from_record(file: &FileRecord) -> Self {
+        Self {
+            id: file.id.clone(),
+            name: file.filename.clone(),
+            file_type: file.mime_type.clone(),
+            size: file.size as u64,
+            content: Vec::new(),
         }
     }
 
