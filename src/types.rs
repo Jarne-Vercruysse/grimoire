@@ -1,13 +1,16 @@
+use std::u8;
+
 use leptos::prelude::*;
-use leptos::web_sys::File;
-use reactive_stores::{ArcStore, Field, Store, StoreFieldIterator};
+use reactive_stores::{ArcStore, Store};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+
+use crate::features::upload::FileRecord;
 
 #[derive(Debug, Default, Clone, Store, PartialEq, Eq)]
 pub struct Files {
     #[store(key: Uuid = |file| file.id)]
-    pub entries: Vec<FileEntry>,
+    pub entries: Vec<FileRecord>,
 }
 
 #[derive(Debug, Clone, Store, PartialEq, Eq, Serialize, Deserialize)]
@@ -16,17 +19,19 @@ pub struct FileEntry {
     pub name: String,
     pub file_type: String,
     pub size: u64,
+    pub content: Vec<u8>,
 }
 
 #[derive(Debug, Clone, Store, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Message {
     Connect,
     Disconnect,
-    Welcome { list: Vec<FileEntry> },
-    Add { entry: FileEntry },
+    Welcome { list: Vec<FileRecord> },
+    Add { entry: FileRecord },
     Remove { id: Uuid },
     MarkComplete { id: Uuid, completed: bool },
-    Edit { id: Uuid, entry: FileEntry },
+    Edit { id: Uuid, entry: FileRecord },
+    Download { id: Uuid },
 }
 
 #[derive(Debug, Default, Clone, Copy)]
@@ -65,13 +70,13 @@ impl State {
         }
     }
 
-    fn find(&self, id: &Uuid) -> Option<Field<FileEntry>> {
-        let store = self.0.entries().read_untracked();
-        store
-            .iter()
-            .position(|file| &file.id == id)
-            .map(|idx| self.0.entries().at_unkeyed(idx).into())
-    }
+    // fn find(&self, id: &Uuid) -> Option<Field<FileEntry>> {
+    //     let store = self.0.entries().read_untracked();
+    //     store
+    //         .iter()
+    //         .position(|file| &file.id == id)
+    //         .map(|idx| self.0.entries().at_unkeyed(idx).into())
+    // }
 }
 
 impl Client {
@@ -88,10 +93,10 @@ impl Client {
 }
 
 impl FileEntry {
-    pub fn from(file: &File) -> Self {
+    pub fn from(file: gloo::file::File, content: Vec<u8>) -> Self {
         let id = Uuid::new_v4();
         let name = file.name();
-        let file_type = file.type_();
+        let file_type = file.raw_mime_type();
         let size = file.size() as u64;
 
         Self {
@@ -99,8 +104,23 @@ impl FileEntry {
             name,
             file_type,
             size,
+            content,
         }
     }
+    pub fn from_record(file: &FileRecord) -> Self {
+        Self {
+            id: file.id.clone(),
+            name: file.filename.clone(),
+            file_type: file.mime_type.clone(),
+            size: file.size as u64,
+            content: Vec::new(),
+        }
+    }
+
+    pub fn update_content(&mut self, content: Vec<u8>) {
+        self.content = content;
+    }
+
     pub fn format_size(&self) -> String {
         const KB: u64 = 1024;
         const MB: u64 = KB * 1024;
