@@ -10,7 +10,7 @@ use crate::features::upload::FileRecord;
 #[derive(Debug, Default, Clone, Store, PartialEq, Eq)]
 pub struct Files {
     #[store(key: Uuid = |file| file.id)]
-    pub entries: Vec<FileEntry>,
+    pub entries: Vec<FileRecord>,
 }
 
 #[derive(Debug, Clone, Store, PartialEq, Eq, Serialize, Deserialize)]
@@ -26,11 +26,11 @@ pub struct FileEntry {
 pub enum Message {
     Connect,
     Disconnect,
-    Welcome { list: Vec<FileEntry> },
-    Add { entry: FileEntry },
+    Welcome { list: Vec<FileRecord> },
+    Add { entry: FileRecord },
     Remove { id: Uuid },
     MarkComplete { id: Uuid, completed: bool },
-    Edit { id: Uuid, entry: FileEntry },
+    Edit { id: Uuid, entry: FileRecord },
     Download { id: Uuid },
 }
 

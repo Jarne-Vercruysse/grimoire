@@ -1,8 +1,9 @@
 use crate::{
-    features::storage::get_files,
+    features::storage::{GetFiles, get_files},
     func::{bytes_to_blob, download_link},
     types::{Client, FileEntry, FileEntryStoreFields, FilesStoreFields, Message},
 };
+use leptos::task::{spawn_local, spawn_local_scoped};
 use reactive_stores::Field;
 
 use super::{auth::LogoutUser, upload::UploadZone};
@@ -133,28 +134,32 @@ fn Sidebar() -> impl IntoView {
 
 #[component]
 fn Table(client: Client) -> impl IntoView {
-    // let stored_files = Resource::new(
-    //     move || client.store.0.entries().get(),
-    //     |_| async move {
-    //         match get_files().await {
-    //             Ok(files) => Some(files),
-    //             Err(_) => None,
-    //         }
-    //     },
-    // );
+    let x = OnceResource::new(get_files());
 
     view! {
-        <table class="table w-full bg-base-100 shadow rounded-box">
-            <TableHeader />
-            <tbody>
-                <Suspense fallback=move || view! { <p>"Loading..."</p> }>
-                    <For each=move || client.store.0.entries() key=|file| file.id().get() let:file>
+        <Suspense fallback=move || view! { <p>"Loading..."</p> }>
+            <table class="table w-full bg-base-100 shadow rounded-box">
+                <TableHeader />
+                <tbody>
+                    <For each=move || x.get() key=|file| file.id().get() let:file>
                         <FileRow client file />
                     </For>
-                </Suspense>
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </Suspense>
     }
+
+    // view! {
+    //     <Suspense fallback=move || view! { <p>"Loading..."</p> }>
+    //         <table class="table w-full bg-base-100 shadow rounded-box">
+    //             <TableHeader />
+    //             <tbody>
+    //                 <For each=move || client.store.0.entries() key=|file| file.id().get() let:file>
+    //                     <FileRow client file />
+    //                 </For>
+    //             </tbody>
+    //         </table>
+    //     </Suspense>}
 }
 
 #[component]
@@ -214,3 +219,40 @@ fn FileRow(client: Client, #[prop(into)] file: Field<FileEntry>) -> impl IntoVie
         </tr>
     }
 }
+// #[component]
+// fn FileRow(client: Client, #[prop(into)] file: Field<FileEntry>) -> impl IntoView {
+//     let blob = bytes_to_blob(&file.get_untracked());
+//     let url = download_link(blob);
+//     //let (link, set_link) = signal(download_link(bytes_to_blob(client.store.0.)));
+//     let remove_handler = move |_| {
+//         client.update(Message::Remove {
+//             id: file.id().get(),
+//         })
+//     };
+//
+//     view! {
+//         <tr class="hover:bg-base-200">
+//             <td>
+//                 <label>
+//                     <input type="checkbox" class="checkbox checkbox-sm" />
+//                 </label>
+//             </td>
+//             <td>{file.name()}</td>
+//             <td>{file.file_type()}</td>
+//             <td>{move || file.get().format_size()}</td>
+//             <td>
+//                 <div class="badge badge-neutral">Pending</div>
+//             </td>
+//             <td>
+//                 <button class="btn btn-sm btn-outline" on:click=remove_handler>
+//                     "Delete"
+//                 </button>
+//
+//                 // TODO: Make it change the status
+//                 <a href=url download class="btn btn-sm btn-outline">
+//                     "Download"
+//                 </a>
+//             </td>
+//         </tr>
+//     }
+// }

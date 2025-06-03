@@ -31,7 +31,7 @@ pub struct FileUpload {
     pub data: Vec<u8>,
 }
 
-#[derive(Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct FileRecord {
     pub id: Uuid,
     pub filename: String,
