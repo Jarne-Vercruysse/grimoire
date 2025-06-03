@@ -1,7 +1,7 @@
+use crate::pages;
 use {
-    super::features::*,
-    crate::{features::storage::get_files, types::Client},
-    leptos::{prelude::*, task::spawn_local},
+    crate::core::types::AppState,
+    leptos::prelude::*,
     leptos_meta::{MetaTags, Stylesheet, Title, provide_meta_context},
     leptos_router::{
         StaticSegment,
@@ -30,18 +30,19 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
 #[component]
 pub fn App() -> impl IntoView {
     provide_meta_context();
-    let client = Client::new();
-    provide_context(client);
+    let app_state = AppState::new();
+    provide_context(app_state);
 
     view! {
         <Stylesheet id="leptos" href="/pkg/grimoire.css" />
         <Title text="Grimoire" />
         <Router>
             <main>
-                <Routes fallback=|| "Error">
-                    <Route path=StaticSegment("login") view=auth::LoginPage />
-                    <Route path=StaticSegment("registration") view=registration::RegistrationPage />
-                    <Route path=StaticSegment("") view=|| home::HomePage />
+                <Routes fallback=|| "error">
+                    // <Route path=StaticSegment("login") view=auth::LoginPage />
+                    // <Route path=StaticSegment("registration") view=registration::RegistrationPage />
+                    // <Route path=StaticSegment("") view=|| home::HomePage />
+                    <Route path=StaticSegment("") view=|| pages::home::HomePage />
                 </Routes>
             </main>
         </Router>
