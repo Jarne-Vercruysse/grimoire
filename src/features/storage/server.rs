@@ -1,24 +1,20 @@
-use leptos::prelude::*;
+use leptos::{logging, prelude::*};
 
+use super::types::{FileRecord, FileStorage, NewFileRecord};
 use crate::core::config::UPLOAD_DIR;
-use crate::features::upload::types::{FileRecord, NewFileRecord};
 use tokio::fs::{self, File};
 use tokio::io::AsyncWriteExt;
 use uuid::Uuid;
 
 #[server]
-pub async fn save_uploaded_file(
-    filename: String,
-    bytes: Vec<u8>,
-    id: Uuid,
-) -> Result<String, ServerFnError> {
-    let folder = format!("{}/user/{}", UPLOAD_DIR, id);
+pub async fn save_uploaded_file(file: FileStorage) -> Result<String, ServerFnError> {
+    let folder = format!("{}/user/{}", UPLOAD_DIR, file.id);
     fs::create_dir_all(&folder).await?;
 
-    let full_path = format!("{}/{}", folder, filename);
+    let full_path = format!("{}/{}", folder, file.filename);
 
-    let mut file = File::create(&full_path).await?;
-    file.write_all(&bytes).await?;
+    let mut blob = File::create(&full_path).await?;
+    blob.write_all(&file.content).await?;
 
     Ok(full_path)
 }
@@ -27,6 +23,8 @@ pub async fn save_uploaded_file(
 pub async fn get_files() -> Result<Vec<FileRecord>, ServerFnError> {
     use self::ssr::db;
 
+    // fake a slower load of all the files
+    std::thread::sleep(std::time::Duration::from_millis(2500));
     let mut conn = db().await?;
     let files = sqlx::query_as!(FileRecord, "SELECT * from files")
         .fetch_all(&mut conn)
@@ -41,7 +39,7 @@ pub async fn store_in_db(file: NewFileRecord) -> Result<(), ServerFnError> {
     let mut conn = db().await?;
 
     // fake API delay
-    std::thread::sleep(std::time::Duration::from_millis(250));
+    std::thread::sleep(std::time::Duration::from_millis(2500));
 
     match sqlx::query(
         "INSERT INTO files (id, filename, mime_type, size, storage_path) VALUES ($1,$2,$3,$4,$5)",
@@ -54,9 +52,22 @@ pub async fn store_in_db(file: NewFileRecord) -> Result<(), ServerFnError> {
     .execute(&mut conn)
     .await
     {
-        Ok(_row) => Ok(()),
+        Ok(_row) => {
+            logging::log!("Stored in DB");
+            Ok(())
+        }
         Err(e) => Err(ServerFnError::new(e)),
     }
+}
+
+#[server]
+pub async fn delete_file_in_storage(id: Uuid) -> Result<(), ServerFnError> {
+    Ok(())
+}
+
+#[server]
+pub async fn delete_file_in_db(id: Uuid) -> Result<(), ServerFnError> {
+    Ok(())
 }
 
 pub mod ssr {
