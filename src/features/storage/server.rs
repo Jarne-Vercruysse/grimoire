@@ -1,18 +1,10 @@
-use leptos::{logging, prelude::*};
+use leptos::prelude::*;
 
-#[cfg(feature = "ssr")]
+use crate::core::config::UPLOAD_DIR;
+use crate::features::upload::types::{FileRecord, NewFileRecord};
 use tokio::fs::{self, File};
-
-#[cfg(feature = "ssr")]
 use tokio::io::AsyncWriteExt;
 use uuid::Uuid;
-
-use crate::features::upload::FileRecord;
-
-use super::upload::NewFileRecord;
-
-#[cfg(feature = "ssr")]
-const UPLOAD_DIR: &str = "./data";
 
 #[server]
 pub async fn save_uploaded_file(
@@ -36,7 +28,6 @@ pub async fn get_files() -> Result<Vec<FileRecord>, ServerFnError> {
     use self::ssr::db;
 
     let mut conn = db().await?;
-    //let mut files = Vec::new();
     let files = sqlx::query_as!(FileRecord, "SELECT * from files")
         .fetch_all(&mut conn)
         .await?;
@@ -68,7 +59,6 @@ pub async fn store_in_db(file: NewFileRecord) -> Result<(), ServerFnError> {
     }
 }
 
-#[cfg(feature = "ssr")]
 pub mod ssr {
     // use http::{header::SET_COOKIE, HeaderMap, HeaderValue, StatusCode};
     use dotenvy::dotenv;

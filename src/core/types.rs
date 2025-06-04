@@ -10,7 +10,7 @@ pub struct User {
 }
 
 // #[derive(Debug, Clone, Copy)]
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct AppState {
     pub files: FileState, //files: Store<FilePreviews>,
 }
@@ -48,6 +48,11 @@ pub enum FileAction {
     Download(Uuid),
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum StateAction {
+    Load(Vec<FilePreview>),
+}
+
 impl FilePreview {
     pub fn from_record(file: FileRecord) -> Self {
         Self {
@@ -75,6 +80,14 @@ impl AppState {
     pub fn new() -> Self {
         Self {
             files: FileState(Store::new(FilePreviews::default())),
+        }
+    }
+
+    pub fn load_initial_file_state(&self, action: StateAction) {
+        match action {
+            StateAction::Load(files) => files
+                .iter()
+                .for_each(|file| self.files.apply_action(FileAction::Add(file.clone()))),
         }
     }
 

@@ -18,3 +18,12 @@ pub struct FileRecord {
     pub uploaded_at: chrono::NaiveDateTime,
     pub storage_path: String,
 }
+
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
+pub struct NewFileRecord {
+    pub id: Uuid,
+    pub filename: String,
+    pub mime_type: String,
+    pub size: i32,
+    pub storage_path: String,
+}

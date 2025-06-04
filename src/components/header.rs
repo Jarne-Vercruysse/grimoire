@@ -3,11 +3,14 @@ use leptos::prelude::*;
 #[component]
 pub fn Header() -> impl IntoView {
     view! {
-        <h2 class="text-lg font-bold text-gray-700 mb-3">My Files</h2>
-        <div class="grid grid-cols-4 text-sm text-gray-500 border-b font-semibold py-2">
-            <div>Name</div>
-            <div>Size</div>
-            <div>Mime</div>
+        <div class="flex items-center gap-x-4 px-4 py-3 text-sm font-semibold text-base-content/70 border-b border-base-300 bg-base-100 sticky top-0 z-10 shadow-sm">
+            <div class="w-[5%] flex justify-center">
+                <input type="checkbox" class="checkbox checkbox-xs" />
+            </div>
+            <div class="w-[35%] truncate">Name</div>
+            <div class="w-[15%] text-right">Size</div>
+            <div class="w-[30%] truncate">Mime</div>
+            <div class="w-[15%] text-right">Actions</div>
         </div>
     }
 }

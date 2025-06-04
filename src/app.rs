@@ -1,4 +1,6 @@
-use crate::pages;
+use leptos::reactive::spawn_local;
+
+use crate::{core::types::StateAction, features::storage::api::load_users_files, pages};
 use {
     crate::core::types::AppState,
     leptos::prelude::*,
@@ -12,7 +14,7 @@ use {
 pub fn shell(options: LeptosOptions) -> impl IntoView {
     view! {
         <!DOCTYPE html>
-        <html lang="en">
+        <html lang="en" data-theme="silk">
             <head>
                 <meta charset="utf-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -31,6 +33,15 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
 pub fn App() -> impl IntoView {
     provide_meta_context();
     let app_state = AppState::new();
+
+    Effect::new(move || {
+        spawn_local(async move {
+            if let Ok(fetched) = load_users_files().await {
+                app_state.load_initial_file_state(StateAction::Load(fetched));
+            }
+        });
+    });
+
     provide_context(app_state);
 
     view! {
