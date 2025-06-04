@@ -30,10 +30,17 @@ pub async fn load_users_files() -> Result<Vec<FilePreview>, ServerFnError> {
 
 #[server]
 pub async fn delete_file(id: Uuid) -> Result<(), ServerFnError> {
-    todo!();
     #[cfg(feature = "ssr")]
     {
-        use super::server::get_files;
+        if let Err(err) = get_file(id).await {
+            return Err(ServerFnError::ServerError(err.to_string()));
+        }
+        if let Err(err) = delete_file_in_storage(id).await {
+            return Err(ServerFnError::ServerError(err.to_string()));
+        }
+        if let Err(err) = delete_file_in_db(id).await {
+            return Err(ServerFnError::ServerError(err.to_string()));
+        }
         return Ok(());
     }
 }

@@ -24,7 +24,7 @@ pub async fn get_files() -> Result<Vec<FileRecord>, ServerFnError> {
     use self::ssr::db;
 
     // fake a slower load of all the files
-    std::thread::sleep(std::time::Duration::from_millis(2500));
+    //std::thread::sleep(std::time::Duration::from_millis(2500));
     let mut conn = db().await?;
     let files = sqlx::query_as!(FileRecord, "SELECT * from files")
         .fetch_all(&mut conn)
@@ -39,7 +39,7 @@ pub async fn store_in_db(file: NewFileRecord) -> Result<(), ServerFnError> {
     let mut conn = db().await?;
 
     // fake API delay
-    std::thread::sleep(std::time::Duration::from_millis(2500));
+    //std::thread::sleep(std::time::Duration::from_millis(2500));
 
     match sqlx::query(
         "INSERT INTO files (id, filename, mime_type, size, storage_path) VALUES ($1,$2,$3,$4,$5)",
@@ -61,12 +61,34 @@ pub async fn store_in_db(file: NewFileRecord) -> Result<(), ServerFnError> {
 }
 
 #[server]
+pub async fn get_file(id: Uuid) -> Result<FileRecord, ServerFnError> {
+    use self::ssr::db;
+
+    let mut conn = db().await?;
+    let file = sqlx::query_as!(FileRecord, "SELECT * from files WHERE id = $1", id)
+        .fetch_one(&mut conn)
+        .await?;
+
+    Ok(file)
+}
+
+#[server]
 pub async fn delete_file_in_storage(id: Uuid) -> Result<(), ServerFnError> {
+    let folder = format!("{}/user/{}", UPLOAD_DIR, id);
+    fs::remove_dir_all(folder).await?;
     Ok(())
 }
 
 #[server]
 pub async fn delete_file_in_db(id: Uuid) -> Result<(), ServerFnError> {
+    use self::ssr::db;
+
+    let mut conn = db().await?;
+    let _ = sqlx::query("DELETE FROM files WHERE id = $1")
+        .bind(id)
+        .execute(&mut conn)
+        .await?;
+
     Ok(())
 }
 
