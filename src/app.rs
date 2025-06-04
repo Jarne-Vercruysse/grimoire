@@ -1,7 +1,9 @@
+use leptos::reactive::spawn_local;
+
+use crate::{core::types::StateAction, features::storage::api::load_users_files, pages};
 use {
-    super::features::*,
-    crate::{features::storage::get_files, types::Client},
-    leptos::{prelude::*, task::spawn_local},
+    crate::core::types::AppState,
+    leptos::prelude::*,
     leptos_meta::{MetaTags, Stylesheet, Title, provide_meta_context},
     leptos_router::{
         StaticSegment,
@@ -12,7 +14,7 @@ use {
 pub fn shell(options: LeptosOptions) -> impl IntoView {
     view! {
         <!DOCTYPE html>
-        <html lang="en">
+        <html lang="en" data-theme="silk">
             <head>
                 <meta charset="utf-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -30,18 +32,28 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
 #[component]
 pub fn App() -> impl IntoView {
     provide_meta_context();
-    let client = Client::new();
-    provide_context(client);
+    let app_state = AppState::new();
+
+    Effect::new(move || {
+        spawn_local(async move {
+            if let Ok(fetched) = load_users_files().await {
+                app_state.load_initial_file_state(StateAction::Load(fetched));
+            }
+        });
+    });
+
+    provide_context(app_state);
 
     view! {
         <Stylesheet id="leptos" href="/pkg/grimoire.css" />
         <Title text="Grimoire" />
         <Router>
             <main>
-                <Routes fallback=|| "Error">
-                    <Route path=StaticSegment("login") view=auth::LoginPage />
-                    <Route path=StaticSegment("registration") view=registration::RegistrationPage />
-                    <Route path=StaticSegment("") view=|| home::HomePage />
+                <Routes fallback=|| "error">
+                    // <Route path=StaticSegment("login") view=auth::LoginPage />
+                    // <Route path=StaticSegment("registration") view=registration::RegistrationPage />
+                    // <Route path=StaticSegment("") view=|| home::HomePage />
+                    <Route path=StaticSegment("") view=|| pages::home::HomePage />
                 </Routes>
             </main>
         </Router>
