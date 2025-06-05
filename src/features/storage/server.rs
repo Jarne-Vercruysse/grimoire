@@ -80,6 +80,19 @@ pub async fn delete_file_in_storage(id: Uuid) -> Result<(), ServerFnError> {
 }
 
 #[server]
+pub async fn get_stored_file(id: Uuid, filename: String) -> Result<FileStorage, ServerFnError> {
+    let folder = format!("{}/user/{}/{}", UPLOAD_DIR, id, filename);
+    let content = fs::read(folder).await?;
+    let file = FileStorage {
+        id,
+        filename,
+        content,
+    };
+
+    Ok(file)
+}
+
+#[server]
 pub async fn delete_file_in_db(id: Uuid) -> Result<(), ServerFnError> {
     use self::ssr::db;
 

@@ -1,5 +1,5 @@
 use leptos::prelude::*;
-use reactive_stores::Store;
+use reactive_stores::{Field, Store, StoreFieldIterator};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -29,7 +29,7 @@ pub struct FilePreview {
     pub id: Uuid,
     pub filename: String,
     pub mime: String,
-    pub size: i32,
+    pub size: u64,
     //pub state: FileUploadState,
 }
 
@@ -59,15 +59,15 @@ impl FilePreview {
             id: file.id,
             filename: file.filename,
             mime: file.mime_type,
-            size: file.size,
+            size: file.size as u64,
         }
     }
-    pub fn from_gloo(file: gloo::file::File, content: Vec<u8>) -> Self {
+    pub fn from_gloo(id: Uuid, file: gloo::file::File, content: Vec<u8>) -> Self {
         Self {
-            id: Uuid::new_v4(),
+            id,
             filename: file.name(),
             mime: file.raw_mime_type(),
-            size: content.len() as i32,
+            size: content.len() as u64,
         }
     }
 }
@@ -81,6 +81,14 @@ impl FileState {
             }
             FileAction::Download { id: _ } => todo!(),
         }
+    }
+
+    pub fn find(&self, id: &Uuid) -> Option<Field<FilePreview>> {
+        let store = self.0.files().read_untracked();
+        store
+            .iter()
+            .position(|file| &file.id == id)
+            .map(|idx| self.0.files().at_unkeyed(idx).into())
     }
 }
 

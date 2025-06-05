@@ -13,7 +13,7 @@ pub struct FileRecord {
     pub id: Uuid,
     pub filename: String,
     pub mime_type: String,
-    pub size: i32,
+    pub size: i64,
     pub uploaded_at: chrono::NaiveDateTime,
     pub storage_path: String,
 }
@@ -23,8 +23,14 @@ pub struct NewFileRecord {
     pub id: Uuid,
     pub filename: String,
     pub mime_type: String,
-    pub size: i32,
+    pub size: i64,
     pub storage_path: String,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
+pub struct FileContent {
+    pub id: Uuid,
+    pub content: Vec<u8>,
 }
 
 impl NewFileRecord {
@@ -32,7 +38,7 @@ impl NewFileRecord {
         id: Uuid,
         filename: String,
         mime_type: String,
-        size: i32,
+        size: i64,
         storage_path: String,
     ) -> Self {
         Self {

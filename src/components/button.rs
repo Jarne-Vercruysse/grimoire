@@ -6,7 +6,7 @@ use gloo::file::{
     callbacks::{self, FileReader},
 };
 use leptos::{
-    html::Input,
+    html::{A, Input},
     logging::{self, log},
     prelude::*,
     reactive::spawn_local,
@@ -14,8 +14,11 @@ use leptos::{
 };
 
 use crate::{
-    core::types::{AppState, FileAction, FilePreview},
-    features::storage::api::{delete_file, handle_upload},
+    core::{
+        types::{AppState, FileAction, FilePreview},
+        utils::{bytes_to_blob, download_link},
+    },
+    features::storage::api::{delete_file, get_file_content, handle_upload},
 };
 
 #[component]
@@ -35,6 +38,7 @@ pub fn UploadButton() -> impl IntoView {
         );
 
         files.iter().for_each(move |file| {
+            let id = Uuid::new_v4();
             let form = web_sys::FormData::new().unwrap();
             form.append_with_blob_and_filename(
                 "file",
@@ -42,7 +46,9 @@ pub fn UploadButton() -> impl IntoView {
                 &file.name(),
             )
             .unwrap();
+            form.set_with_str("file_id", &id.to_string()).unwrap();
             spawn_local(async move {
+                // TODO: handle error
                 let _ = handle_upload(form.into()).await;
             });
 
@@ -54,7 +60,7 @@ pub fn UploadButton() -> impl IntoView {
                     Ok(content) => {
                         logging::log!("bytes: {}", content.len());
                         // INFO: We need to use the cloned value here otherwise we get a borrowing issue
-                        let file_preview = FilePreview::from_gloo(blob, content);
+                        let file_preview = FilePreview::from_gloo(id, blob, content);
                         state.update_file_state(FileAction::Add { file: file_preview });
                     }
                     Err(err) => logging::log!("Error: {}", err),
@@ -85,7 +91,7 @@ pub fn UploadButton() -> impl IntoView {
 pub fn DeleteButton(id: Uuid) -> impl IntoView {
     let state = expect_context::<AppState>();
     let on_click = move |_| {
-        //TODO: Change ICON to loadingicon
+        //TODO: Change ICON to loadingicon prob would need a noderef for that
         spawn_local(async move {
             let result = delete_file(id).await;
             match result {
@@ -107,4 +113,29 @@ pub fn DeleteButton(id: Uuid) -> impl IntoView {
 }
 
 #[component]
-pub fn DownloadButton() -> impl IntoView {}
+pub fn DownloadButton(id: Uuid) -> impl IntoView {
+    let a_ref = NodeRef::<A>::new();
+    let state = expect_context::<AppState>();
+
+    let on_click = move |_| {
+        let node = a_ref.get().expect("a_ref to be mounted");
+        if let Some(file) = state.files.find(&id) {
+            let file = file.get_untracked();
+            spawn_local(async move {
+                if let Ok(stored_file) = get_file_content(file.id, file.clone().filename).await {
+                    let blob = bytes_to_blob(file, stored_file.content);
+                    let url = download_link(blob);
+                    node.set_href(&url);
+                    node.click();
+                }
+            });
+        }
+    };
+
+    view! {
+        <button on:click=on_click class="btn btn-ghost btn-xs">
+            D
+        </button>
+        <a node_ref=a_ref download class="hidden"></a>
+    }
+}
