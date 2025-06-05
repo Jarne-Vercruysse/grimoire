@@ -127,7 +127,7 @@ pub async fn fetch_download_file_by_id(id: Uuid) -> Result<FileDownload, ServerF
                     id,
                     filename: record.filename,
                     mime_type: record.mime_type,
-                    size: record.size,
+                    size: record.size as u64,
                     content: file.content,
                 };
 

@@ -139,3 +139,42 @@ pub fn DownloadButton(id: Uuid) -> impl IntoView {
         <a node_ref=a_ref download class="hidden"></a>
     }
 }
+
+#[component]
+pub fn DownloadPageButton(id: Uuid) -> impl IntoView {
+    let a_ref = NodeRef::<A>::new();
+    let state = expect_context::<AppState>();
+
+    let on_click = move |_| {
+        let node = a_ref.get().expect("a_ref to be mounted");
+        if let Some(file) = state.files.find(&id) {
+            let file = file.get_untracked();
+            spawn_local(async move {
+                if let Ok(stored_file) = get_file_content(file.id, file.clone().filename).await {
+                    let blob = bytes_to_blob(file, stored_file.content);
+                    let url = download_link(blob);
+                    node.set_href(&url);
+                    node.click();
+                }
+            });
+        }
+    };
+
+    view! {
+        <button on:click=on_click class="btn btn-primary btn-wide">
+            Download
+        </button>
+        <a node_ref=a_ref download class="hidden"></a>
+    }
+}
+
+#[component]
+pub fn ShareButton(#[prop(into)] id: Uuid) -> impl IntoView {
+    let url = format!("/download/{}", id);
+
+    view! {
+        <a href=url class="btn btn-ghost btn-xs">
+            L
+        </a>
+    }
+}
