@@ -8,6 +8,7 @@ use {
     leptos_router::{
         StaticSegment,
         components::{Route, Router, Routes},
+        path,
     },
 };
 
@@ -50,9 +51,7 @@ pub fn App() -> impl IntoView {
         <Router>
             <main>
                 <Routes fallback=|| "error">
-                    // <Route path=StaticSegment("login") view=auth::LoginPage />
-                    // <Route path=StaticSegment("registration") view=registration::RegistrationPage />
-                    // <Route path=StaticSegment("") view=|| home::HomePage />
+                    <Route path=path!("/download/:id") view=pages::download::DownloadPage />
                     <Route path=StaticSegment("") view=|| pages::home::HomePage />
                 </Routes>
             </main>

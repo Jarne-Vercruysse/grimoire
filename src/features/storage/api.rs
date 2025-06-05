@@ -5,12 +5,13 @@ use server_fn::{
 };
 use uuid::Uuid;
 
+use super::types::{FileDownload, NewFileRecord};
 use crate::{core::types::FilePreview, features::storage::types::FileStorage};
 
 #[cfg(feature = "ssr")]
-use crate::features::storage::server::*;
-#[cfg(feature = "ssr")]
-use crate::features::storage::types::NewFileRecord;
+use super::server::*;
+//#[cfg(feature = "ssr")]
+//use super::types::{FileDownload, NewFileRecord};
 #[cfg(feature = "ssr")]
 use leptos::logging;
 #[cfg(feature = "ssr")]
@@ -112,6 +113,28 @@ pub async fn get_file_content(id: Uuid, filename: String) -> Result<FileStorage,
         if let Ok(file) = get_stored_file(id, filename).await {
             return Ok(file);
         }
+        return Err(ServerFnError::ServerError("not found".to_owned()));
+    }
+}
+
+#[server]
+pub async fn fetch_download_file_by_id(id: Uuid) -> Result<FileDownload, ServerFnError> {
+    #[cfg(feature = "ssr")]
+    {
+        if let Ok(record) = get_file(id).await {
+            if let Ok(file) = get_stored_file(id, record.filename.clone()).await {
+                let download = FileDownload {
+                    id,
+                    filename: record.filename,
+                    mime_type: record.mime_type,
+                    size: record.size,
+                    content: file.content,
+                };
+
+                return Ok(download);
+            }
+        }
+
         return Err(ServerFnError::ServerError("not found".to_owned()));
     }
 }

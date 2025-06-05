@@ -19,6 +19,15 @@ pub struct FileRecord {
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
+pub struct FileDownload {
+    pub id: Uuid,
+    pub filename: String,
+    pub mime_type: String,
+    pub size: i64,
+    pub content: Vec<u8>,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct NewFileRecord {
     pub id: Uuid,
     pub filename: String,
