@@ -1,5 +1,5 @@
 use crate::{
-    components::{header::Header, row::Row},
+    components::{button::UploadButton, header::Header, row::Row},
     core::types::{AppState, FilePreviewStoreFields, FilePreviewsStoreFields},
 };
 use leptos::prelude::*;
@@ -13,7 +13,8 @@ pub fn HomePage() -> impl IntoView {
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-lg font-bold text-base-content">My Files</h2>
                 <div class="space-x-2">
-                    <button class="btn btn-sm btn-primary">+ Upload</button>
+                    <UploadButton />
+                    // <button class="btn btn-sm btn-primary">+ Upload</button>
                     <button class="btn btn-sm btn-disabled">Create download link</button>
                 </div>
             </div>

@@ -1,9 +1,9 @@
 use leptos::prelude::*;
-use reactive_stores::Store;
+use reactive_stores::{Field, Store, StoreFieldIterator};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::features::upload::types::FileRecord;
+use crate::features::storage::types::FileRecord;
 
 pub struct User {
     pub id: Uuid,
@@ -29,7 +29,7 @@ pub struct FilePreview {
     pub id: Uuid,
     pub filename: String,
     pub mime: String,
-    pub size: i32,
+    pub size: u64,
     //pub state: FileUploadState,
 }
 
@@ -43,14 +43,14 @@ pub struct FilePreview {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum FileAction {
-    Add(FilePreview),
-    Remove(Uuid),
-    Download(Uuid),
+    Add { file: FilePreview },
+    Remove { id: Uuid },
+    Download { id: Uuid },
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum StateAction {
-    Load(Vec<FilePreview>),
+    InitialiseFileState(Vec<FilePreview>),
 }
 
 impl FilePreview {
@@ -59,7 +59,15 @@ impl FilePreview {
             id: file.id,
             filename: file.filename,
             mime: file.mime_type,
-            size: file.size,
+            size: file.size as u64,
+        }
+    }
+    pub fn from_gloo(id: Uuid, file: gloo::file::File, content: Vec<u8>) -> Self {
+        Self {
+            id,
+            filename: file.name(),
+            mime: file.raw_mime_type(),
+            size: content.len() as u64,
         }
     }
 }
@@ -67,12 +75,20 @@ impl FilePreview {
 impl FileState {
     pub fn apply_action(&self, action: FileAction) {
         match action {
-            FileAction::Add(file) => self.0.files().write().push(file),
-            FileAction::Remove(id) => {
+            FileAction::Add { file } => self.0.files().write().push(file),
+            FileAction::Remove { id } => {
                 self.0.files().write().retain(|file| file.id != id);
             }
-            FileAction::Download(_id) => todo!(),
+            FileAction::Download { id: _ } => todo!(),
         }
+    }
+
+    pub fn find(&self, id: &Uuid) -> Option<Field<FilePreview>> {
+        let store = self.0.files().read_untracked();
+        store
+            .iter()
+            .position(|file| &file.id == id)
+            .map(|idx| self.0.files().at_unkeyed(idx).into())
     }
 }
 
@@ -83,11 +99,12 @@ impl AppState {
         }
     }
 
-    pub fn load_initial_file_state(&self, action: StateAction) {
+    pub fn initialise_state(&self, action: StateAction) {
         match action {
-            StateAction::Load(files) => files
-                .iter()
-                .for_each(|file| self.files.apply_action(FileAction::Add(file.clone()))),
+            StateAction::InitialiseFileState(files) => files.iter().for_each(|file| {
+                self.files
+                    .apply_action(FileAction::Add { file: file.clone() })
+            }),
         }
     }
 

@@ -37,7 +37,7 @@ pub fn App() -> impl IntoView {
     Effect::new(move || {
         spawn_local(async move {
             if let Ok(fetched) = load_users_files().await {
-                app_state.load_initial_file_state(StateAction::Load(fetched));
+                app_state.initialise_state(StateAction::InitialiseFileState(fetched));
             }
         });
     });
