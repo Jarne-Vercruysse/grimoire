@@ -42,3 +42,12 @@ Once you have the prerequisites set up, you can run your Leptos project with a s
 ```bash
 cargo leptos watch
 ```
+
+## Academic Contributions
+
+This project was developed as part of a **graduaatsproef** at **HOGent**. The following documents provide a deeper dive into the theoretical background, methodology, and results of this project:
+
+- **Paper:** [Paper](academic/paper.pdf)
+- **Project Poster:** [Poster](academic/poster.pdf)
+
+Please refer to these documents for a comprehensive understanding of the project's academic context and contributions.
