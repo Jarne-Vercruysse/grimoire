@@ -5,13 +5,13 @@ use server_fn::{
 };
 use uuid::Uuid;
 
-use super::types::{FileDownload, NewFileRecord};
+use super::types::FileDownload;
 use crate::{core::types::FilePreview, features::storage::types::FileStorage};
 
 #[cfg(feature = "ssr")]
 use super::server::*;
-//#[cfg(feature = "ssr")]
-//use super::types::{FileDownload, NewFileRecord};
+#[cfg(feature = "ssr")]
+use super::types::NewFileRecord;
 #[cfg(feature = "ssr")]
 use leptos::logging;
 #[cfg(feature = "ssr")]
