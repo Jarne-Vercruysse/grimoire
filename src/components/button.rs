@@ -1,3 +1,5 @@
+use icondata;
+use leptos_icons::Icon;
 use std::collections::HashMap;
 use uuid::Uuid;
 use wasm_bindgen_futures::JsFuture;
@@ -86,7 +88,7 @@ pub fn UploadButton() -> impl IntoView {
 
     view! {
         <button on:click=on_click class="btn btn-sm btn-primary">
-            + Upload
+                 <Icon icon=icondata::AiUploadOutlined width="2.5em" height="2.5em" />
         </button>
         <input type="file" node_ref=input_ref multiple class="hidden" on:change=on_change />
     }
@@ -112,7 +114,7 @@ pub fn DeleteButton(id: Uuid) -> impl IntoView {
 
     view! {
         <button on:click=on_click class="btn btn-ghost btn-xs">
-            X
+                 <Icon icon=icondata::RiDeleteBin5SystemFill width="2em" height="2em" />
         </button>
     }
 }
@@ -139,7 +141,8 @@ pub fn DownloadButton(id: Uuid) -> impl IntoView {
 
     view! {
         <button on:click=on_click class="btn btn-ghost btn-xs">
-            D
+                 <Icon icon=icondata::AiDownloadOutlined width="2em" height="2em" />
+
         </button>
         <a node_ref=a_ref download class="hidden"></a>
     }
@@ -167,6 +170,7 @@ pub fn DownloadPageButton(id: Uuid) -> impl IntoView {
 
     view! {
         <button on:click=on_click class="btn btn-primary btn-wide">
+                 <Icon icon=icondata::AiDownloadOutlined width="2em" height="2em" />
             Download
         </button>
         <a node_ref=a_ref download class="hidden"></a>
@@ -187,8 +191,8 @@ pub fn ShareButton(#[prop(into)] id: Uuid) -> impl IntoView {
     };
 
     view! {
-        <button on:click=on_click class="btn btn-primary btn-wide">
-           LINK
+        <button on:click=on_click class="btn btn-ghost btn-xs">
+                 <Icon icon=icondata::AiLinkOutlined width="2em" height="2em" />
         </button>
     }
 }
