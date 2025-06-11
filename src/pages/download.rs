@@ -35,10 +35,10 @@ pub fn DownloadPage() -> impl IntoView {
                                 <h1 class="text-2xl font-bold">"Ready to download your file"</h1>
                                 <div class="space-y-1">
                                     <p class="text-lg font-medium truncate">
-                                        {file.filename} "example-report.pdf"
+                                        {file.filename}
                                     </p>
                                     <p class="text-sm text-base-content/60">
-                                        {format_size(file.size)} "•" {file.mime_type}
+                                        {format_size(file.size)} " • " {file.mime_type}
                                     </p>
                                 </div>
                                 <DownloadPageButton id=file.id />
