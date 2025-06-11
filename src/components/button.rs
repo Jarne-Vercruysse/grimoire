@@ -1,10 +1,15 @@
 use std::collections::HashMap;
 use uuid::Uuid;
+use wasm_bindgen_futures::JsFuture;
 
-use gloo::file::{
-    FileList,
-    callbacks::{self, FileReader},
+use gloo::{
+    file::{
+        FileList,
+        callbacks::{self, FileReader},
+    },
+    utils::window,
 };
+
 use leptos::{
     html::{A, Input},
     logging::{self, log},
@@ -170,11 +175,20 @@ pub fn DownloadPageButton(id: Uuid) -> impl IntoView {
 
 #[component]
 pub fn ShareButton(#[prop(into)] id: Uuid) -> impl IntoView {
-    let url = format!("/download/{}", id);
+    // TODO: Remove hardcode APP FQDN
+    let on_click = move |_| {
+        spawn_local(async move {
+            let url = format!("http://localhost:3000/download/{}", id);
+            let window = window();
+            let nav = window.navigator().clipboard();
+            let promise = nav.write_text(&url);
+            let _result = JsFuture::from(promise).await.expect("it to work");
+        })
+    };
 
     view! {
-        <a href=url class="btn btn-ghost btn-xs">
-            L
-        </a>
+        <button on:click=on_click class="btn btn-primary btn-wide">
+           LINK
+        </button>
     }
 }
