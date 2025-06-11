@@ -1,5 +1,5 @@
 use crate::{
-    components::button::{DeleteButton, DownloadButton, ShareButton},
+    components::button::{DeleteButton, ShareButton},
     core::{
         types::{FilePreview, FilePreviewStoreFields},
         utils::format_size,
@@ -20,7 +20,7 @@ pub fn row(#[prop(into)] file: reactive_stores::Field<FilePreview>) -> impl Into
             <div class="w-[15%] text-right">{formated_size}</div>
             <div class="w-[30%] truncate">{file.mime()}</div>
             <div class="w-[15%] text-right space-x-1">
-                <DownloadButton id=id />
+                //<DownloadButton id=id />
                 <DeleteButton id=id />
                 <ShareButton id=id />
             </div>
