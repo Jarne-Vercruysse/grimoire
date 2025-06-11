@@ -23,9 +23,11 @@ serde = { version = "1", features = ["derive"] }
 uuid = { version = "1.16.0", features = ["v4", "js", "serde"] }
 sqlx = { version = "0.8", features = ["chrono", "runtime-tokio","postgres","migrate","uuid" ], optional = true }
 leptos-use = { version = "0.16.0-beta", default-features = false, features = ["use_drop_zone"]}
-gloo = {version = "0.11.0", default-features = false, features= ["file", "net"]}
+gloo = {version = "0.11.0", default-features = false, features= ["file", "utils"]}
+web-sys = { version = "0.3", features = ["Clipboard"] }
 dotenvy = "0.15"
 chrono = {version = "0.4", features= ["serde"]}
+wasm-bindgen-futures = "0.4.50"
 
 [features]
 hydrate = [
